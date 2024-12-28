@@ -20,7 +20,7 @@ class HistoryView(APIView):
     """View for generating order history data."""
 
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get(self, request):
         """Generate order history data based on the provided parameters."""
 
@@ -68,7 +68,7 @@ class HistoryView(APIView):
         if self.part:
             parts = self.part.get_descendants(include_self=True)
             builds = builds.filter(part__in=parts)
-        
+
         builds = builds.filter(
             status__in=BuildStatusGroups.COMPLETE,
             completed__gt=0
@@ -148,7 +148,7 @@ class HistoryView(APIView):
             order__complete_date__gte=self.start_date,
             order__complete_date__lte=self.end_date
         )
-        
+
         # Exclude any lines which do not map to an internal part
         lines = lines.exclude(part__part=None)
 
@@ -243,7 +243,7 @@ class HistoryView(APIView):
             history_items[part.pk] = part_history
 
         return self.format_response(parts, history_items, 'sales')
-    
+
     def generate_return_order_history(self):
         """Generate return order history data."""
 
@@ -262,7 +262,7 @@ class HistoryView(APIView):
         if self.part:
             parts = self.part.get_descendants(include_self=True)
             lines = lines.filter(item__part__in=parts)
-        
+
         # Filter by customer
         if self.company:
             lines = lines.filter(order__customer=self.company)
@@ -300,10 +300,10 @@ class HistoryView(APIView):
             history_items[part.pk] = part_history
 
         return self.format_response(parts, history_items, 'return')
-    
+
     def format_response(self, part_dict: dict, history_items: dict, order_type: str) -> Response:
         """Format the response data for the order history.
-        
+
         Arguments:
             - part_dict: A dictionary of parts
             - history_items: A dictionary of history items
@@ -327,13 +327,13 @@ class HistoryView(APIView):
                     history.append({'date': date_key, 'quantity': 0})
 
             history = sorted(history, key=lambda x: x['date'])
-            
+
             # Construct an entry for each part
             response.append({
                 'part': part_dict[part_id],
                 'history': history
             })
-        
+
         return Response(
             serializers.OrderHistoryResponseSerializer(response, many=True).data
         )
