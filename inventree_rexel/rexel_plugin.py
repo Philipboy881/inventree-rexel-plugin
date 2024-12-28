@@ -1,17 +1,15 @@
 # Django stuff
-from django.utils.translation import gettext_lazy as _ # type: ignore
+from django.utils.translation import gettext_lazy as _  # type: ignore
 
 # InvenTree plugin libs
-from plugin import InvenTreePlugin # type: ignore
-
+from plugin import InvenTreePlugin  # type: ignore
 from .version import REXEL_PLUGIN_VERSION
-from .request_wrappers import Wrappers # type: ignore
+from bs4 import BeautifulSoup
 
 import requests
 import sys
-import os
 import json
-from bs4 import BeautifulSoup
+
 
 
 class ZebraLabelPlugin(InvenTreePlugin):
@@ -22,7 +20,7 @@ class ZebraLabelPlugin(InvenTreePlugin):
     SLUG = "rexel"
     PUBLISH_DATE = "28-12-2024"
     TITLE = "Rexel part import"
-    
+
     SETTINGS = {
         'USERNAME': {
             'name': _('username'),
@@ -36,22 +34,22 @@ class ZebraLabelPlugin(InvenTreePlugin):
         },
     }
 
-
     # login functie
-    def login(session, URL, username, password):
+    def login(self, session, url, username, password):
+
         # Definieer je login URL, gebruikersnaam en wachtwoord
         login_data = {
             "j_username": username,
             "j_password": password
         }
-        login_response = session.post(URL, data=login_data)
+        login_response = session.post(url, data=login_data)
         if login_response.status_code != 200:
             return False
         return session
 
-
     # get price function
-    def get_Price(session, url):
+    def get_price(self, session, url):
+
         response = session.get(url)
 
         if response.status_code != 200:
@@ -62,8 +60,7 @@ class ZebraLabelPlugin(InvenTreePlugin):
         # print(response.text)
         return data[0]['price']
 
-
-    def get_product_url(session, sku, url):
+    def get_product_url(self, session, sku, url):
         response = session.get(url + sku)
         if response.status_code != 200:
             print(f"Fout bij ophalen product URL: {response.status_code}")
@@ -92,7 +89,7 @@ class ZebraLabelPlugin(InvenTreePlugin):
             sys.exit()
 
 
-    def get_product_data(session, url):
+    def get_product_data(self, session, url):
         # print(url)
         response = session.get(url)
 
@@ -103,8 +100,7 @@ class ZebraLabelPlugin(InvenTreePlugin):
         data = response.text
         return data
 
-
-    def extract_table_data(tables):
+    def extract_table_data(self, tables):
         """
         Functie om de gegevens uit de tabellen te extraheren die 'algemene informatie' bevatten.
         Dit retourneert een dictionary met de naam-waarde paren van de tabel.
@@ -124,11 +120,11 @@ class ZebraLabelPlugin(InvenTreePlugin):
                 # Zoek naar de 'th' en 'td' tags in de rij
                 th = row.find("th")
                 td = row.find("td")
-                
+
                 # Als we zowel een th als een td vinden
                 if th and td:
                     attribute_name = th.get_text(strip=True)  # Naam van het attribuut (bijv. "Conditie/kortingsgroep")
-                    
+
                     # Zoek de waarde in de span tag om dubbele waarden te vermijden
                     span = td.find("span", class_="tech-table-values-text")
                     if span:
@@ -143,27 +139,25 @@ class ZebraLabelPlugin(InvenTreePlugin):
                         algemene_info[attribute_name] = attribute_value
 
         return algemene_info
-    
 
-    def get_Data_from_html(self, html, price, sku):
+    def get_data_from_html(self, html, price, sku):
         # Hoofdfunctie om gegevens uit de HTML te extraheren, inclusief productnaam, omschrijving, etc.
 
         # Maak een BeautifulSoup object van de HTML
         soup = BeautifulSoup(html, "html.parser")
-        
+   
         # Zoek naar de productnaam
         productnaam = soup.find("h1", class_="font-weight-bold mb-1")  # Voor productnaam
         cleaned_productnaam = productnaam.get_text(strip=True) if productnaam else "Naam niet beschikbaar"
         # Zoek naar de levernummers (productcode en EAN)
-        Levernr = soup.find_all("div", class_="col-auto pl-0 col-md-auto p-md-0 font-weight-bold word-break")  # Voor productnummer
-        cleaned_Levernr = [Levernr.get_text(strip=True) for LeverNR in Levernr]
-        
+        levernr = soup.find_all("div", class_="col-auto pl-0 col-md-auto p-md-0 font-weight-bold word-break")  # Voor productnummer
+        cleaned_levernr = [levernr.get_text(strip=True) for levernr in levernr]
         # Splits de leverNr in product_code en ean_code
-        if len(cleaned_Levernr) > 1:
-            product_code = cleaned_Levernr[0]
-            ean_code = cleaned_Levernr[1]
+        if len(cleaned_levernr) > 1:
+            product_code = cleaned_levernr[0]
+            ean_code = cleaned_levernr[1]
         else:
-            product_code = cleaned_Levernr[0] if cleaned_Levernr else "Code niet beschikbaar"
+            product_code = cleaned_levernr[0] if cleaned_levernr else "Code niet beschikbaar"
             ean_code = "EAN niet beschikbaar"
 
         # Zoek naar de productomschrijving
@@ -172,8 +166,8 @@ class ZebraLabelPlugin(InvenTreePlugin):
         # Gebruik de extract_table_data functie om algemene informatie uit de tabellen te halen
         tabel1 = soup.find_all("div", class_="col-6 pr-5 px-lg-3")
         tabel2 = soup.find_all("div", class_="col-6 pl-5 px-lg-4")
-        algemene_informatie_1 = self.extract_table_data(tabel1)
-        algemene_informatie_2 = self.extract_table_data(tabel2)
+        algemene_informatie_1 = self.extract_table_data(self, tabel1)
+        algemene_informatie_2 = self.extract_table_data(self, tabel2)
         algemene_informatie = {**algemene_informatie_1, **algemene_informatie_2}
 
         # Zet alles in een gestructureerde JSON
@@ -186,10 +180,8 @@ class ZebraLabelPlugin(InvenTreePlugin):
             "omschrijving": cleaned_productomschrijving,
             "algemene_informatie": algemene_informatie,
         }
-        
         # Zet de data om in JSON-formaat en retourneer deze
         return json.dumps(data, indent=4)
-
 
     def get_product(self, username, password, product):
         base_url = "https://www.rexel.nl/nln"
@@ -202,20 +194,21 @@ class ZebraLabelPlugin(InvenTreePlugin):
         session = requests.Session()
 
         # log gebruiker in
-        session = self.login(session, login_url, username, password)
+        session = self.login(self, session, login_url, username, password)
 
         # verkrijg url en sku
-        product_url_sku = self.get_product_url(session, self.productcode, searchbox_url)
+        product_url_sku = self.get_product_url(self, session, self.productcode, searchbox_url)
         # print (product_url_sku)
 
         # verkijg de user prijs
         if session is not False:
-            price = self.get_Price(session, price_url + product_url_sku['code'] + price_url1)
+            price = self.get_price(self, session, price_url + product_url_sku['code'] + price_url1)
             # print("Price", price)
 
         # verkrijg de product data
-        product_data = self.get_product_data(session, base_url + product_url_sku["url"])
+        product_data = self.get_product_data(self, session, base_url + product_url_sku["url"])
 
         # converteer de data
-        data = self.get_Data_from_html(product_data, price, product_url_sku['code'])
+        data = self.get_data_from_html(product_data, price, product_url_sku['code'])
         return(data)
+    
