@@ -16,7 +16,7 @@ from . import helpers
 from . import serializers
 
 
-class HistoryView(APIView):
+class RexelView(APIView):
     """View for generating order history data."""
 
     permission_classes = [permissions.IsAuthenticated]
