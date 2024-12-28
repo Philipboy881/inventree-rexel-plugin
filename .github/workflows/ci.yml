@@ -49,7 +49,18 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18"
+      - name: Install Python Dependencies
+        run: |
+          pip install --upgrade wheel setuptools twine build
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build --emptyOutDir
       - name: Install build dependencies
         run: pip install --upgrade wheel setuptools twine build
 
