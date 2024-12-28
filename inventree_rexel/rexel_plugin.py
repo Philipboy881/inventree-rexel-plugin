@@ -11,7 +11,7 @@ import sys
 import json
 
 
-class rexelPlugin(InvenTreePlugin):
+class RexelPlugin(InvenTreePlugin):
     AUTHOR = "Philip van der honing"
     DESCRIPTION = "rexel parts import plugin"
     VERSION = REXEL_PLUGIN_VERSION

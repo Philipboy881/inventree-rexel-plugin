@@ -47,7 +47,7 @@ setuptools.setup(
 
     entry_points={
         "inventree_plugins": [
-            "rexelPlugin = inventree_rexel.rexel_plugin:rexelPlugin"
+            "rexelPlugin = inventree_rexel.rexel_plugin:RexelPlugin"
         ]
     },
 )
