@@ -36,7 +36,7 @@ class ZebraLabelPlugin(InvenTreePlugin):
     # login functie
     def login(self, session, url, username, password):
 
-        # Definieer je login URL, gebruikersnaam en wachtwoord
+        # Definieer je login URL, gebruikersnaam en wachtwoord 
         login_data = {
             "j_username": username,
             "j_password": password
