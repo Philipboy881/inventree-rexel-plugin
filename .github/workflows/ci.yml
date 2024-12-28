@@ -37,9 +37,9 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: release
-      url: https://pypi.org/project/inventree-rexel-plugin
+      url: https://pypi.org/p/inventree-rexel-plugin
     permissions:
-      contents: read
+      id-token: write
 
     steps:
       - name: Checkout
@@ -57,6 +57,5 @@ jobs:
         run: python3 -m build
 
       - name: Publish package to PyPI
-        uses: pypa/gh-action-pypi-publish@v2
-        with:
-          password: ${{ secrets.PYPI_TOKEN }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+
