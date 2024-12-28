@@ -10,8 +10,6 @@ import requests
 import sys
 import json
 
-
-
 class ZebraLabelPlugin(InvenTreePlugin):
     AUTHOR = "Philip van der honing"
     DESCRIPTION = "rexel parts import plugin"
@@ -88,7 +86,6 @@ class ZebraLabelPlugin(InvenTreePlugin):
             print("Geen productgegevens gevonden in de response.")
             sys.exit()
 
-
     def get_product_data(self, session, url):
         # print(url)
         response = session.get(url)
@@ -145,7 +142,7 @@ class ZebraLabelPlugin(InvenTreePlugin):
 
         # Maak een BeautifulSoup object van de HTML
         soup = BeautifulSoup(html, "html.parser")
-   
+
         # Zoek naar de productnaam
         productnaam = soup.find("h1", class_="font-weight-bold mb-1")  # Voor productnaam
         cleaned_productnaam = productnaam.get_text(strip=True) if productnaam else "Naam niet beschikbaar"
@@ -210,5 +207,4 @@ class ZebraLabelPlugin(InvenTreePlugin):
 
         # converteer de data
         data = self.get_data_from_html(product_data, price, product_url_sku['code'])
-        return(data)
-    
+        return data

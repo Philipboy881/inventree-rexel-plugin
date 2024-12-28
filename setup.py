@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-import setuptools # type: ignore
+import setuptools  # type: ignore
 
 from inventree_rexel.version import REXEL_PLUGIN_VERSION
 
