@@ -35,10 +35,10 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
         """Returns the URLs defined by this plugin."""
 
         from django.urls import path
-        from .views import HistoryView
+        from .views import RexelView
 
         return [
-            path('history/', HistoryView.as_view(), name='order-history'),
+            path('rexel/', RexelView.as_view(), name='import-rexel-part'),
         ]
 
     def is_panel_visible(self, target: str, pk: int) -> bool:
