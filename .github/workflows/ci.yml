@@ -30,33 +30,33 @@ jobs:
         run: |
           flake8 . --max-line-length=100 --ignore=E731,E501
 
-publish:
-  if: github.event_name == 'release' && github.event.action == 'published'
-  needs: [style-python]
-  name: 📦 Publish to PyPI
-  runs-on: ubuntu-latest
-  environment:
-    name: release
-    url: https://pypi.org/project/inventree-rexel-plugin
-  permissions:
-    contents: read
+  publish:
+    if: github.event_name == 'release' && github.event.action == 'published'
+    needs: [style-python]
+    name: 📦 Publish to PyPI
+    runs-on: ubuntu-latest
+    environment:
+      name: release
+      url: https://pypi.org/project/inventree-rexel-plugin
+    permissions:
+      contents: read
 
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v4 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4 
 
-    - name: Setup python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.10"
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
 
-    - name: Install build dependencies
-      run: pip install --upgrade wheel setuptools twine build
+      - name: Install build dependencies
+        run: pip install --upgrade wheel setuptools twine build
 
-    - name: Build pip package
-      run: python3 -m build
+      - name: Build pip package
+        run: python3 -m build
 
-    - name: Publish package to PyPI
-      uses: pypa/gh-action-pypi-publish@v1
-      with:
-        password: ${{ secrets.PYPI_TOKEN }}
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@v1
+        with:
+          password: ${{ secrets.PYPI_TOKEN }}
