@@ -1,21 +1,18 @@
 # Django stuff
-from django.utils.translation import gettext_lazy as _
-from django.core.validators import MinValueValidator
-from django.core.validators import MaxValueValidator
-from django.core.files.base import ContentFile
+from django.utils.translation import gettext_lazy as _ # type: ignore
 
 # InvenTree plugin libs
-from plugin import InvenTreePlugin
+from plugin import InvenTreePlugin # type: ignore
 
 from .version import REXEL_PLUGIN_VERSION
-from .request_wrappers import Wrappers
+from .request_wrappers import Wrappers # type: ignore
 
 import requests
 import sys
 import os
 import json
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
+
 
 class ZebraLabelPlugin(InvenTreePlugin):
     AUTHOR = "Philip van der honing"
@@ -39,8 +36,9 @@ class ZebraLabelPlugin(InvenTreePlugin):
         },
     }
 
-    #login functie
-    def Login(session, URL, username, password):
+
+    # login functie
+    def login(session, URL, username, password):
         # Definieer je login URL, gebruikersnaam en wachtwoord
         login_data = {
             "j_username": username,
@@ -51,19 +49,21 @@ class ZebraLabelPlugin(InvenTreePlugin):
             return False
         return session
 
-    #get price function
-    def GET_Price(session, url):
+
+    # get price function
+    def get_Price(session, url):
         response = session.get(url)
 
         if response.status_code != 200:
             print(f"Fout bij ophalen prijs: {response.status_code}")
             sys.exit()
-        #print("Prijs succesvol opgehaald!")
+        # print("Prijs succesvol opgehaald!")
         data = response.json()
-        #print(response.text)
+        # print(response.text)
         return data[0]['price']
 
-    def GET_product_url(session, sku, url):
+
+    def get_product_url(session, sku, url):
         response = session.get(url + sku)
         if response.status_code != 200:
             print(f"Fout bij ophalen product URL: {response.status_code}")
@@ -91,17 +91,19 @@ class ZebraLabelPlugin(InvenTreePlugin):
             print("Geen productgegevens gevonden in de response.")
             sys.exit()
 
-    def GET_product_data(session, url):
-        #print(url)
+
+    def get_product_data(session, url):
+        # print(url)
         response = session.get(url)
 
         if response.status_code != 200:
             print(f"Fout bij ophalen product data: {response.status_code}")
             sys.exit()
-        #print("url succesvol opgehaald!")
+        # print("url succesvol opgehaald!")
         data = response.text
         return data
-        
+
+
     def extract_table_data(tables):
         """
         Functie om de gegevens uit de tabellen te extraheren die 'algemene informatie' bevatten.
@@ -110,11 +112,11 @@ class ZebraLabelPlugin(InvenTreePlugin):
         algemene_info = {}
 
         # Zoek naar de divs die de tabellen bevatten
-        #print("Aantal tabellen gevonden voor algemene informatie:", len(tables))  # Debugging output
+        # print("Aantal tabellen gevonden voor algemene informatie:", len(tables))  # Debugging output
 
         # Loop door elke tabel om de relevante informatie te extraheren
         for table in tables:
-            #print("Tabel inhoud:", table.prettify())  # Debugging output, om de inhoud van de tabel te zien
+            # print("Tabel inhoud:", table.prettify())  # Debugging output, om de inhoud van de tabel te zien
 
             # Zoek naar alle rijen in de tabel
             rows = table.find_all("tr")
@@ -134,7 +136,7 @@ class ZebraLabelPlugin(InvenTreePlugin):
                     else:
                         attribute_value = td.get_text(strip=True)  # Als er geen span is, nemen we de volledige inhoud van de td
 
-                    #print(f"Gevonden waarde voor {attribute_name}: {attribute_value}")  # Debugging output
+                    # print(f"Gevonden waarde voor {attribute_name}: {attribute_value}")  # Debugging output
 
                     # Voeg de naam en waarde toe aan de dictionary als beide niet leeg zijn
                     if attribute_name and attribute_value:
@@ -142,31 +144,31 @@ class ZebraLabelPlugin(InvenTreePlugin):
 
         return algemene_info
     
-    def Get_Data_from_html(self, html, price, sku):
-        """
-        Hoofdfunctie om gegevens uit de HTML te extraheren, inclusief productnaam, omschrijving, etc.
-        """
+
+    def get_Data_from_html(self, html, price, sku):
+        # Hoofdfunctie om gegevens uit de HTML te extraheren, inclusief productnaam, omschrijving, etc.
+
         # Maak een BeautifulSoup object van de HTML
         soup = BeautifulSoup(html, "html.parser")
         
         # Zoek naar de productnaam
-        productNaam = soup.find("h1", class_="font-weight-bold mb-1")  # Voor productnaam
-        cleaned_productNaam = productNaam.get_text(strip=True) if productNaam else "Naam niet beschikbaar"
+        productnaam = soup.find("h1", class_="font-weight-bold mb-1")  # Voor productnaam
+        cleaned_productnaam = productnaam.get_text(strip=True) if productnaam else "Naam niet beschikbaar"
         # Zoek naar de levernummers (productcode en EAN)
-        LeverNR = soup.find_all("div", class_="col-auto pl-0 col-md-auto p-md-0 font-weight-bold word-break")  # Voor productnummer
-        cleaned_LeverNR = [LeverNR.get_text(strip=True) for LeverNR in LeverNR]
+        Levernr = soup.find_all("div", class_="col-auto pl-0 col-md-auto p-md-0 font-weight-bold word-break")  # Voor productnummer
+        cleaned_Levernr = [Levernr.get_text(strip=True) for LeverNR in Levernr]
         
         # Splits de leverNr in product_code en ean_code
-        if len(cleaned_LeverNR) > 1:
-            product_code = cleaned_LeverNR[0]
-            ean_code = cleaned_LeverNR[1]
+        if len(cleaned_Levernr) > 1:
+            product_code = cleaned_Levernr[0]
+            ean_code = cleaned_Levernr[1]
         else:
-            product_code = cleaned_LeverNR[0] if cleaned_LeverNR else "Code niet beschikbaar"
+            product_code = cleaned_Levernr[0] if cleaned_Levernr else "Code niet beschikbaar"
             ean_code = "EAN niet beschikbaar"
 
         # Zoek naar de productomschrijving
-        productOmschrijving = soup.find("div", class_="long-product-description")  # Voor productomschrijving
-        cleaned_productOmschrijving = productOmschrijving.get_text(strip=True) if productOmschrijving else "Omschrijving niet beschikbaar"
+        productomschrijving = soup.find("div", class_="long-product-description")  # Voor productomschrijving
+        cleaned_productomschrijving = productomschrijving.get_text(strip=True) if productomschrijving else "Omschrijving niet beschikbaar"
         # Gebruik de extract_table_data functie om algemene informatie uit de tabellen te halen
         tabel1 = soup.find_all("div", class_="col-6 pr-5 px-lg-3")
         tabel2 = soup.find_all("div", class_="col-6 pl-5 px-lg-4")
@@ -176,17 +178,18 @@ class ZebraLabelPlugin(InvenTreePlugin):
 
         # Zet alles in een gestructureerde JSON
         data = {
-            "naam": cleaned_productNaam,
+            "naam": cleaned_productnaam,
             "product_code": product_code,
             "ean_code": ean_code,
             "sku": sku,
             "price": price,
-            "omschrijving": cleaned_productOmschrijving,
+            "omschrijving": cleaned_productomschrijving,
             "algemene_informatie": algemene_informatie,
         }
         
         # Zet de data om in JSON-formaat en retourneer deze
         return json.dumps(data, indent=4)
+
 
     def get_product(self, username, password, product):
         base_url = "https://www.rexel.nl/nln"
@@ -199,20 +202,20 @@ class ZebraLabelPlugin(InvenTreePlugin):
         session = requests.Session()
 
         # log gebruiker in
-        session = self.Login(session, login_url, username, password)
+        session = self.login(session, login_url, username, password)
 
-        #verkrijg url en sku
-        product_url_sku = self.GET_product_url(session, self.productcode, searchbox_url)
-        #print (product_url_sku)
+        # verkrijg url en sku
+        product_url_sku = self.get_product_url(session, self.productcode, searchbox_url)
+        # print (product_url_sku)
 
-        #verkijg de user prijs
-        if session != False:
-            price = self.GET_Price(session, price_url + product_url_sku['code'] + price_url1)
-            #print("Price", price)
+        # verkijg de user prijs
+        if session is not False:
+            price = self.get_Price(session, price_url + product_url_sku['code'] + price_url1)
+            # print("Price", price)
 
-        #verkrijg de product data
-        product_data = self.GET_product_data(session, base_url + product_url_sku["url"])
+        # verkrijg de product data
+        product_data = self.get_product_data(session, base_url + product_url_sku["url"])
 
-        #converteer de data
-        data = self.Get_Data_from_html(product_data, price, product_url_sku['code'])
+        # converteer de data
+        data = self.get_Data_from_html(product_data, price, product_url_sku['code'])
         return(data)
