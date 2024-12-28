@@ -17,7 +17,7 @@ class RexelPlugin(InvenTreePlugin):
     VERSION = REXEL_PLUGIN_VERSION
     NAME = "rexel"
     SLUG = "rexel"
-    PUBLISH_DATE = "28-12-2024"
+    PUBLISH_DATE = "2024-12-28"
     TITLE = "Rexel part import"
 
     SETTINGS = {
