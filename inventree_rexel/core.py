@@ -20,17 +20,16 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
 
     SETTINGS = {
         'USERNAME': {
-            'name': _('username'),
-            'description': _('username van je rexel account'),
+            'name': ('username'),
+            'description': ('username van je rexel account'),
             'default': '',
         },
         'PASSWORD': {
-            'name': _('IP Address'),
-            'description': _('password van je rexel account'),
+            'name': ('IP Address'),
+            'description': ('password van je rexel account'),
             'default': '',
         }
     }
-
 
     def setup_urls(self):
         """Returns the URLs defined by this plugin."""
@@ -68,10 +67,10 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
 
                 if company.is_supplier and self.plugin_settings.get('PURCHASE_ORDER_HISTORY'):
                     return True
-                
+
                 if company.is_customer and (self.plugin_settings.get('SALES_ORDER_HISTORY') or self.plugin_settings.get('RETURN_ORDER_HISTORY')):
                     return True
-                
+
                 return False
 
             except Exception:
@@ -84,10 +83,10 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
 
                 if part.assembly and self.plugin_settings.get('BUILD_ORDER_HISTORY'):
                     return True
-                
+
                 if part.purchaseable and self.plugin_settings.get('PURCHASE_ORDER_HISTORY'):
                     return True
-                
+
                 if part.salable and (self.plugin_settings.get('SALES_ORDER_HISTORY') or self.plugin_settings.get('RETURN_ORDER_HISTORY')):
                     return True
 
@@ -106,7 +105,7 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
 
         if not user or not user.is_authenticated:
             return []
-        
+
         # Cache the settings for this plugin
         self.plugin_settings = self.get_settings_dict()
 
@@ -136,4 +135,3 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
                 }
             }
         ]
-    

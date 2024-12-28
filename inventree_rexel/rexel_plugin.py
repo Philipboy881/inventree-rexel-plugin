@@ -1,6 +1,3 @@
-# Django stuff
-from django.utils.translation import gettext_lazy as _  # type: ignore
-
 # InvenTree plugin libs
 from plugin import InvenTreePlugin  # type: ignore
 from bs4 import BeautifulSoup
@@ -11,7 +8,6 @@ import json
 
 
 class RexelData(InvenTreePlugin):
-
 
     # login functie
     def login(self, session, url, username, password):
