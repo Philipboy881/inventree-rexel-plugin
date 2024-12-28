@@ -31,6 +31,8 @@ setuptools.setup(
     license="MIT",
 
     packages=setuptools.find_packages(),
+,
+    include_package_data=True,
 
     install_requires=[
         'tablib',
@@ -44,7 +46,7 @@ setuptools.setup(
         "twine",
     ],
 
-    python_requires=">=3.6",
+    python_requires=">=3.9",
 
     entry_points={
         "inventree_plugins": [

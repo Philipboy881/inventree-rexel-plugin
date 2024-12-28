@@ -23,7 +23,7 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
             'default': '',
         },
         'PASSWORD': {
-            'name': ('IP Address'),
+            'name': ('password van je rexel account'),
             'description': ('password van je rexel account'),
             'default': '',
         },
