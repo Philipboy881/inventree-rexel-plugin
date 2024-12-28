@@ -10,6 +10,7 @@ import requests
 import sys
 import json
 
+
 class ZebraLabelPlugin(InvenTreePlugin):
     AUTHOR = "Philip van der honing"
     DESCRIPTION = "rexel parts import plugin"
