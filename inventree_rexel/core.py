@@ -74,55 +74,8 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
         """Determines whether the order history panel should be visible."""
 
         # Display for the 'build index' page
-        if target == 'manufacturing':
+        if target == 'partcategory':
             return self.plugin_settings.get('BUILD_ORDER_HISTORY')
-
-        # Display for the 'purchase order index' page
-        if target == 'purchasing':
-            return self.plugin_settings.get('PURCHASE_ORDER_HISTORY')
-
-        # Display for a 'supplierpart' object
-        if target == 'supplierpart':
-            return self.plugin_settings.get('PURCHASE_ORDER_HISTORY')
-
-        # Display for the 'sales' page
-        if target == 'sales':
-            return self.plugin_settings.get('SALES_ORDER_HISTORY') or self.plugin_settings.get('RETURN_ORDER_HISTORY')
-
-        # Display for a particular company
-        if target == 'company':
-            try:
-                company = Company.objects.get(pk=pk)
-
-                if company.is_supplier and self.plugin_settings.get('PURCHASE_ORDER_HISTORY'):
-                    return True
-
-                if company.is_customer and (self.plugin_settings.get('SALES_ORDER_HISTORY') or self.plugin_settings.get('RETURN_ORDER_HISTORY')):
-                    return True
-
-                return False
-
-            except Exception:
-                return False
-
-        # Display for a particular part
-        if target == 'part':
-            try:
-                part = Part.objects.get(pk=pk)
-
-                if part.assembly and self.plugin_settings.get('BUILD_ORDER_HISTORY'):
-                    return True
-
-                if part.purchaseable and self.plugin_settings.get('PURCHASE_ORDER_HISTORY'):
-                    return True
-
-                if part.salable and (self.plugin_settings.get('SALES_ORDER_HISTORY') or self.plugin_settings.get('RETURN_ORDER_HISTORY')):
-                    return True
-
-                return False
-
-            except Exception:
-                return False
 
         # No other targets are supported
         return False

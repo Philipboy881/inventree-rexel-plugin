@@ -11,7 +11,7 @@ const queryClient = new QueryClient();
 
 type OrderHistoryPeriod = 'M' | 'Q' | 'Y';
 
-const ORDER_HISTORY_URL = "plugin/order_history/history/";
+const ORDER_HISTORY_URL = "plugin/rexel/import/";
 
 const COLOR_WHEEL = [
     'blue.6',
@@ -416,7 +416,7 @@ function RexelPanel({context}: {context: any}) {
 
 
 /**
- * Render the OrderHistoryPanel component
+ * Render the RexelPanel component
  * 
  * @param target - The target HTML element to render the panel into
  * @param context - The context object to pass to the panel
