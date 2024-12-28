@@ -33,6 +33,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
 
     install_requires=[
+        'tablib',
         'requests',
         'beautifulsoup4',
         'python-dotenv',
@@ -47,7 +48,7 @@ setuptools.setup(
 
     entry_points={
         "inventree_plugins": [
-            "rexelPlugin = inventree_rexel.rexel_plugin:RexelPlugin"
+            "rexelPlugin = inventree_rexel.core:RexelPlugin"
         ]
     },
 )

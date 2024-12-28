@@ -3,7 +3,6 @@ from django.utils.translation import gettext_lazy as _  # type: ignore
 
 # InvenTree plugin libs
 from plugin import InvenTreePlugin  # type: ignore
-from .version import REXEL_PLUGIN_VERSION
 from bs4 import BeautifulSoup
 
 import requests
@@ -11,27 +10,8 @@ import sys
 import json
 
 
-class RexelPlugin(InvenTreePlugin):
-    AUTHOR = "Philip van der honing"
-    DESCRIPTION = "rexel parts import plugin"
-    VERSION = REXEL_PLUGIN_VERSION
-    NAME = "rexel"
-    SLUG = "rexel"
-    PUBLISH_DATE = "2024-12-28"
-    TITLE = "Rexel part import"
+class RexelData(InvenTreePlugin):
 
-    SETTINGS = {
-        'USERNAME': {
-            'name': _('username'),
-            'description': _('username van je rexel account'),
-            'default': '',
-        },
-        'PASSWORD': {
-            'name': _('IP Address'),
-            'description': _('password van je rexel account'),
-            'default': '',
-        },
-    }
 
     # login functie
     def login(self, session, url, username, password):
