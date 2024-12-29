@@ -14,12 +14,16 @@ const RexelPanel: React.FC = () => {
     setError(null);
   
     try {
-      // Zorg ervoor dat je de juiste API aanroept met de zoekterm
-      const response = await fetch(`/rexel/?query=${query}`);
+      const response = await fetch(`/api/rexel/search?query=${query}`);
       const data = await response.json();
   
       if (response.ok) {
-        setResults(data.results);  // Zet de ontvangen zoekresultaten in de state
+        // Zorg ervoor dat 'data.results' een array is voordat we .map() gebruiken
+        if (Array.isArray(data.results)) {
+          setResults(data.results);
+        } else {
+          setError('Unexpected data format received');
+        }
       } else {
         setError(data.error || 'An error occurred');
       }
