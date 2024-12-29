@@ -5,6 +5,7 @@ from company.models import Company
 from part.models import Part
 from part.serializers import PartBriefSerializer
 
+
 class OrderHistoryRequestSerializer(serializers.Serializer):
     """Serializer voor het aanvragen van geschiedenisdata op basis van een zoekopdracht."""
 
@@ -42,6 +43,7 @@ class OrderHistoryRequestSerializer(serializers.Serializer):
     #     required=False,
     #     label=_('Export Format')
     # )
+
 
 class OrderHistoryItemSerializer(serializers.Serializer):
     """Serializer voor een enkel item in de OrderHistoryResponseSerializer."""
