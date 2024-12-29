@@ -29,16 +29,6 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
         }
     }
 
-    # def setup_urls(self):
-       # """Returns the URLs defined by this plugin."""
-
-       # from django.urls import path
-       # from .views import import_rexel_hello_world
-
-       # return [
-       #     path('plugin/inventree_rexel/', import_rexel_hello_world, name='inventree-rexel'),
-       # ]
-
     def is_panel_visible(self, target: str, pk: int) -> bool:
         """Determines whether the order history panel should be visible."""
 
