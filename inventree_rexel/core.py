@@ -1,4 +1,4 @@
-"""Order history plugin for InvenTree."""
+"""rexel part import plugin for InvenTree."""
 
 from plugin import InvenTreePlugin
 from plugin.mixins import SettingsMixin, UrlsMixin, UserInterfaceMixin
@@ -27,30 +27,6 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
             'description': ('password van je rexel account'),
             'default': '',
         },
-        'BUILD_ORDER_HISTORY': {
-            'name': 'Build Order History',
-            'description': 'Enable build order history tracking',
-            'default': True,
-            'validator': bool,
-        },
-        'PURCHASE_ORDER_HISTORY': {
-            'name': 'Purchase Order History',
-            'description': 'Enable purchase order history tracking',
-            'default': True,
-            'validator': bool,
-        },
-        'SALES_ORDER_HISTORY': {
-            'name': 'Sales Order History',
-            'description': 'Enable sales order history tracking',
-            'default': True,
-            'validator': bool,
-        },
-        'RETURN_ORDER_HISTORY': {
-            'name': 'Return Order History',
-            'description': 'Enable return order history tracking',
-            'default': True,
-            'validator': bool,
-        },
         'USER_GROUP': {
             'name': 'Allowed Group',
             'description': 'The user group that is allowed to view order history',
@@ -71,12 +47,9 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
     def is_panel_visible(self, target: str, pk: int) -> bool:
         """Determines whether the order history panel should be visible."""
 
-        # Display for the 'build index' page
+        # Display for the 'parts index' page
         if target == 'partcategory':
-            return self.plugin_settings.get('BUILD_ORDER_HISTORY')
-
-        if target == 'manufacturing':
-            return self.plugin_settings.get('BUILD_ORDER_HISTORY')
+            return True
 
         # No other targets are supported
         return False

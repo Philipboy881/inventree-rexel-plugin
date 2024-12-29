@@ -11,7 +11,7 @@ const queryClient = new QueryClient();
 
 type OrderHistoryPeriod = 'M' | 'Q' | 'Y';
 
-const ORDER_HISTORY_URL = "plugin/inventree_rexel/";
+const INVENTREE_REXEL_URL = "plugin/inventree_rexel/";
 
 const COLOR_WHEEL = [
     'blue.6',
@@ -223,7 +223,7 @@ function RexelPanel({context}: {context: any}) {
     const historyQuery = useQuery(
         {
             queryKey: [
-                'order-history',
+                'inventee-rexel',
                 startDate,
                 endDate,
                 period,
@@ -234,7 +234,7 @@ function RexelPanel({context}: {context: any}) {
             refetchOnMount: false,
             refetchOnWindowFocus: false,
             queryFn: async () => {
-                return context.api?.get(`/${ORDER_HISTORY_URL}`, {
+                return context.api?.get(`/${INVENTREE_REXEL_URL}`, {
                     params: queryParams,
                 }).then((response: any) => {
                     return response.data;
@@ -249,7 +249,7 @@ function RexelPanel({context}: {context: any}) {
     // Callback to download the order history data in a specific format
     const downloadData = useCallback((fileFormat: string) => {
 
-        let url = `${ORDER_HISTORY_URL}?export=${fileFormat}`;
+        let url = `${INVENTREE_REXEL_URL}?export=${fileFormat}`;
 
         if (context.host) {
             url = `${context.host}${url}`;
