@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.views import View
 
+
 class RexelView(View):
     def get(self, request, *args, **kwargs):
         query = request.GET.get('query', '')
