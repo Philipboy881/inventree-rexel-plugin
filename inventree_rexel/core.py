@@ -26,8 +26,47 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
             'name': ('password'),
             'description': ('password van je rexel account'),
             'default': '',
+        },
+        'BUILD_ORDER_HISTORY': {
+            'name': 'Build Order History',
+            'description': 'Enable build order history tracking',
+            'default': True,
+            'validator': bool,
+        },
+        'PURCHASE_ORDER_HISTORY': {
+            'name': 'Purchase Order History',
+            'description': 'Enable purchase order history tracking',
+            'default': True,
+            'validator': bool,
+        },
+        'SALES_ORDER_HISTORY': {
+            'name': 'Sales Order History',
+            'description': 'Enable sales order history tracking',
+            'default': True,
+            'validator': bool,
+        },
+        'RETURN_ORDER_HISTORY': {
+            'name': 'Return Order History',
+            'description': 'Enable return order history tracking',
+            'default': True,
+            'validator': bool,
+        },
+        'USER_GROUP': {
+            'name': 'Allowed Group',
+            'description': 'The user group that is allowed to view order history',
+            'model': 'auth.group',
         }
     }
+
+    def setup_urls(self):
+        """Returns the URLs defined by this plugin."""
+
+        from django.urls import path
+        from .views import HistoryView
+
+        return [
+            path('history/', HistoryView.as_view(), name='inventree-rexel'),
+        ]
 
     def is_panel_visible(self, target: str, pk: int) -> bool:
         """Determines whether the order history panel should be visible."""
@@ -40,7 +79,28 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
         return False
 
     def get_ui_panels(self, request, context=None, **kwargs):
+        """Return a list of UI panels to be rendered in the InvenTree user interface."""
 
+        user = request.user
+
+        if not user or not user.is_authenticated:
+            return []
+        
+        # Cache the settings for this plugin
+        self.plugin_settings = self.get_settings_dict()
+
+        # Check that the user is part of the allowed group
+        if group := self.plugin_settings.get('USER_GROUP'):
+            if not user.groups.filter(pk=group).exists():
+                return []
+
+        target = context.get('target_model')
+        pk = context.get('target_id')
+
+        # Panel should not be visible for this target!
+        if not self.is_panel_visible(target, pk):
+            return []
+        
         return [
             {
                 'key': 'rexel',
@@ -49,6 +109,9 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
                 'icon': 'ti:cloud-download:outline',
                 'source': self.plugin_static_file(
                     'RexelPanel.js:renderPanel'
-                )
+                ),
+                'context': {
+                    'settings': self.plugin_settings,
+                }
             }
         ]
