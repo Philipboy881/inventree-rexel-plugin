@@ -11,10 +11,10 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
     DESCRIPTION = "rexel parts import plugin"
     VERSION = REXEL_PLUGIN_VERSION
     MIN_VERSION = '0.17.0'
-    NAME = "rexel"
-    SLUG = "rexel"
+    NAME = "inventree_rexel"
+    SLUG = "inventree_rexel"
     PUBLISH_DATE = "2024-12-28"
-    TITLE = "Rexel part import"
+    TITLE = "inventree_rexel part import"
 
     SETTINGS = {
         'USERNAME': {
@@ -23,7 +23,7 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
             'default': '',
         },
         'PASSWORD': {
-            'name': ('password van je rexel account'),
+            'name': ('password'),
             'description': ('password van je rexel account'),
             'default': '',
         },

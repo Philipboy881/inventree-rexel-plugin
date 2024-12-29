@@ -1,1 +1,1 @@
-recursive-include inventree_rexel/static *.js *.css
+recursive-include inventree_rexel/static *
