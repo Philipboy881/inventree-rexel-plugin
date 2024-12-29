@@ -41,7 +41,7 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
         from .views import RexelView
 
         return [
-            path('rexel/', RexelView.as_view(), name='import-rexel-part'),
+            path('rexel/', RexelView.as_view(), name='inventree-rexel'),
         ]
 
     def is_panel_visible(self, target: str, pk: int) -> bool:
