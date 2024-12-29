@@ -1,5 +1,6 @@
 import requests
 
+
 def search_rexel_api(query):
     """Zoekfunctie die gegevens ophaalt van de externe API (bijvoorbeeld, Rexel API)."""
     # Stel de URL van de externe API in (vervang deze door de werkelijke URL van de API)
