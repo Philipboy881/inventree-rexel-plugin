@@ -9,16 +9,17 @@ const RexelPanel: React.FC = () => {
   // Functie om de zoekopdracht naar de API te sturen
   const handleSearch = async () => {
     if (!query) return;
-
+  
     setLoading(true);
     setError(null);
-
+  
     try {
-      const response = await fetch(`/api/rexel?query=${query}`);
+      // Zorg ervoor dat je de juiste API aanroept met de zoekterm
+      const response = await fetch(`/api/rexel/search?query=${query}`);
       const data = await response.json();
-
+  
       if (response.ok) {
-        setResults(data.results); // Zet de ontvangen resultaten in de state
+        setResults(data.results);  // Zet de ontvangen zoekresultaten in de state
       } else {
         setError(data.error || 'An error occurred');
       }
