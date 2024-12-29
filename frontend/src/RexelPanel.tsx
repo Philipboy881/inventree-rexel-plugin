@@ -15,7 +15,7 @@ const RexelPanel: React.FC = () => {
   
     try {
       // Zorg ervoor dat je de juiste API aanroept met de zoekterm
-      const response = await fetch(`/api/rexel/search?query=${query}`);
+      const response = await fetch(`/rexel/?query=${query}`);
       const data = await response.json();
   
       if (response.ok) {
