@@ -412,10 +412,6 @@ function RexelPanel({context}: {context: any}) {
         </Paper>
         </>
     );
-    
-    function RexelPanel() {
-        return <h1>Hello World!</h1>;
-    }
 }
 
 
@@ -432,5 +428,4 @@ export function renderPanel(target: HTMLElement, context: any) {
             <RexelPanel context={context}/>
         </MantineProvider>
     )
-
 }

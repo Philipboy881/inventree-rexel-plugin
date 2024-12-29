@@ -75,6 +75,9 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
         if target == 'partcategory':
             return self.plugin_settings.get('BUILD_ORDER_HISTORY')
 
+        if target == 'manufacturing':
+            return self.plugin_settings.get('BUILD_ORDER_HISTORY')
+
         # No other targets are supported
         return False
 
