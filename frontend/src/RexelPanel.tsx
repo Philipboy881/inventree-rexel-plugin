@@ -412,6 +412,10 @@ function RexelPanel({context}: {context: any}) {
         </Paper>
         </>
     );
+    
+    function RexelPanel() {
+        return <h1>Hello World!</h1>;
+    }
 }
 
 
