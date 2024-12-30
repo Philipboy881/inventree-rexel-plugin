@@ -3,6 +3,7 @@ import requests
 import sys
 import json
 
+
 # Login function to authenticate the user
 def login(session, url, username, password):
     # Define login URL, username, and password
@@ -16,6 +17,7 @@ def login(session, url, username, password):
         return False
     return session
 
+
 # Function to get the product price
 def get_price(session, url):
     response = session.get(url)
@@ -26,6 +28,7 @@ def get_price(session, url):
     
     data = response.json()
     return data[0]['price']
+
 
 # Function to get the product URL and SKU from the search result
 def get_product_url(session, sku, url):
@@ -56,6 +59,7 @@ def get_product_url(session, sku, url):
         print("No product data found in the response.")
         sys.exit()
 
+
 # Function to get the product data from the provided URL
 def get_product_data(session, url):
     response = session.get(url)
@@ -66,6 +70,7 @@ def get_product_data(session, url):
 
     data = response.text
     return data
+
 
 # Function to extract general information from product tables
 def extract_table_data(tables):
@@ -99,6 +104,7 @@ def extract_table_data(tables):
                     general_info[attribute_name] = attribute_value
 
     return general_info
+
 
 # Function to get structured data from the product HTML
 def get_data_from_html(html, price, sku):
@@ -146,6 +152,7 @@ def get_data_from_html(html, price, sku):
     # Convert the data to a JSON string and return it
     return json.dumps(data, indent=4)
 
+
 # Main function to get product data and price
 def get_product(username, password, product):
     base_url = "https://www.rexel.nl/nln"
@@ -183,6 +190,7 @@ def get_product(username, password, product):
 
 # Run the program
 print(get_product("", "", "8720207824477"))
+
 
 # view the page directly of this product https://www.rexel.nl/nln/Rexel/Industriele-componenten/Transformatoren-en-voedingen/Voedingen/Gelijkstroomvoedingseenheid/Mean-Well-Gelijkstroomvoedingseenheid-sdr20-24-psu-din-24v-5a/p/2700130858
 
