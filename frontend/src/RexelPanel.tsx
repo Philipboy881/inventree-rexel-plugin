@@ -1,4 +1,4 @@
-import { Button, Group, Paper, TextInput, MantineProvider } from '@mantine/core';
+import { Button, Group, Paper, TextInput } from '@mantine/core';
 import { IconCloudDownload } from '@tabler/icons-react';
 import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
