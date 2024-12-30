@@ -1,9 +1,12 @@
-import { Button, Group, Paper, TextInput } from '@mantine/core';
+import { Button, Group, Paper, TextInput, MantineProvider } from '@mantine/core';
 import { IconCloudDownload } from '@tabler/icons-react';
 import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
-function ImportPanel() {
+
+
+function RexelPanel({context}: {context: any}) {
+
     // State voor de tekstvelden
     const [productNumber, setProductNumber] = useState('');
     const [pastNumber, setPastNumber] = useState('');
@@ -47,11 +50,17 @@ function ImportPanel() {
 }
 
 /**
- * Render het ImportPanel in een gegeven DOM-element.
- *
- * @param target - Het HTML-element waarin we dit paneel renderen.
+ * Render the ImportRexelPanel component
+ * 
+ * @param target - The target HTML element to render the panel into
+ * @param context - The context object to pass to the panel
  */
-export function renderPanel(target: HTMLElement) {
-    const root = createRoot(target);
-    root.render(<ImportPanel />);
+export function renderPanel(target: HTMLElement, context: any) {
+
+    createRoot(target).render(
+        <MantineProvider>
+            <RexelPanel context={context}/>
+        </MantineProvider>
+    )
+
 }
