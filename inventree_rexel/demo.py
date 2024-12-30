@@ -188,6 +188,7 @@ def get_product(username, password, product):
     
     return data
 
+
 # Run the program
 print(get_product("", "", "8720207824477"))
 
