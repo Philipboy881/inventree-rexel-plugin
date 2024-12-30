@@ -6,7 +6,7 @@ import { createRoot } from 'react-dom/client';
 
 
 function RexelPanel({context}: {context: any}) {
-
+    console.log(context);
     // State voor de tekstvelden
     const [productNumber, setProductNumber] = useState('');
     const [pastNumber, setPastNumber] = useState('');
