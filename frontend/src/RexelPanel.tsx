@@ -12,13 +12,24 @@ function ImportPanel({context}: {context: any}) {
     
     // State voor de tekstvelden
     const [productNumber, setProductNumber] = useState('');
-    const [pastNumber, setPastNumber] = useState('');
+    const [partNumber, setpartNumber] = useState('');
 
     // Functie om importactie te triggeren
     const handleImport = () => {
-        if (productNumber && pastNumber) {
-            console.log('Importeren met:', { productNumber, pastNumber });
-            alert(`Gegevens geïmporteerd:\nProduct Nummer: ${productNumber}\nPast Nummer: ${pastNumber}`);
+        if (productNumber && partNumber) {
+            
+
+
+
+
+
+
+
+
+
+
+            console.log('Importeren met:', { productNumber, partNumber });
+            alert(`Gegevens geïmporteerd:\nProduct Nummer: ${productNumber}\nPart Nummer: ${partNumber}`);
         } else {
             alert('Vul beide velden in voordat je importeert.');
         }
@@ -29,16 +40,16 @@ function ImportPanel({context}: {context: any}) {
             <Group gap="xs" grow>
                 {/* Tekstvelden */}
                 <TextInput
-                    label="Product Nummer"
-                    placeholder="Voer productnummer in"
+                    label="enter Product ean, sku, type, description"
+                    placeholder="enter product data"
                     value={productNumber}
                     onChange={(event) => setProductNumber(event.currentTarget.value)}
                 />
                 <TextInput
-                    label="Past Nummer"
-                    placeholder="Voer pastnummer in"
-                    value={pastNumber}
-                    onChange={(event) => setPastNumber(event.currentTarget.value)}
+                    label="New internal part nummer"
+                    placeholder="enter new partnummer"
+                    value={partNumber}
+                    onChange={(event) => setpartNumber(event.currentTarget.value)}
                 />
                 {/* Import knop */}
                 <Button
