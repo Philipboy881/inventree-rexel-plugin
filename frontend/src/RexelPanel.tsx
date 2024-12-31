@@ -11,7 +11,7 @@ const queryClient = new QueryClient();
 
 type OrderHistoryPeriod = 'M' | 'Q' | 'Y';
 
-const ORDER_HISTORY_URL = "plugin/inventree_rexel/rexel/";
+const ORDER_HISTORY_URL = "plugin/inventree_rexel/history/";
 
 const COLOR_WHEEL = [
     'blue.6',
