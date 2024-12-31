@@ -1,19 +1,8 @@
 """API views for the Order History plugin."""
 
-from typing import cast
-
-import tablib
-
-from django.utils.translation import gettext_lazy as _
-
 from rest_framework.response import Response
-from rest_framework import permissions
+from rest_framework import status
 from rest_framework.views import APIView
-
-from InvenTree.helpers import DownloadFile
-
-from . import helpers
-from . import serializers
 
 
 class RexelView(APIView):
