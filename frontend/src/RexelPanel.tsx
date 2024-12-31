@@ -29,7 +29,7 @@ const COLOR_WHEEL = [
     'indigo.6',
 ];
 
-function RexelPanel({context}: {context: any}) {
+function OrderHistoryPanel({context}: {context: any}) {
 
     // Plugin settings object
     const pluginSettings = useMemo(() => context?.context?.settings ?? {}, [context]);
@@ -425,7 +425,7 @@ export function renderPanel(target: HTMLElement, context: any) {
 
     createRoot(target).render(
         <MantineProvider>
-            <RexelPanel context={context}/>
+            <OrderHistoryPanel context={context}/>
         </MantineProvider>
     )
 
