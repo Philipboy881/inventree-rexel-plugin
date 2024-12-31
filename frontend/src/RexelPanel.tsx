@@ -1,20 +1,22 @@
 import { Button, Group, Paper, TextInput, MantineProvider, Alert, Text, Loader } from '@mantine/core';
 import { IconCloudDownload } from '@tabler/icons-react';
 import { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { QueryClient, useQuery } from '@tanstack/react-query'; // Import alleen useQuery en QueryClient
 import { createRoot } from 'react-dom/client';
+
+// Maak een nieuwe QueryClient aan
+const queryClient = new QueryClient();
 
 function ImportPanel({ context }: { context: any }) {
     const pluginSettings = useMemo(() => context?.context?.settings ?? {}, [context]);
 
-    // State voor invoervelden
     const [productNumber, setProductNumber] = useState('');
     const [partNumber, setPartNumber] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const IVENTREE_REXEL_URL = "plugin/inventree_rexel/rexel/";
-    
-    // Query om data op te halen
+
+    // Geef de queryClient door aan useQuery
     const { data, isError, isLoading, refetch } = useQuery<{ 
         productNumber: string; 
         partNumber: string; 
@@ -30,9 +32,8 @@ function ImportPanel({ context }: { context: any }) {
             return response?.data;
         },
         enabled: false, // Alleen uitvoeren als refetch wordt aangeroepen
-    });
+    }, queryClient); // Het doorgeven van queryClient hier
 
-    // Functie om de importactie te triggeren
     const handleImport = async () => {
         if (!productNumber || !partNumber) {
             alert('Enter both fields before import.');
@@ -51,7 +52,6 @@ function ImportPanel({ context }: { context: any }) {
 
     return (
         <Paper withBorder p="sm" m="sm" pos="relative">
-            {/* Loader als laadindicator */}
             {(isSubmitting || isLoading) && (
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
                     <Loader size="xl" />
@@ -84,7 +84,6 @@ function ImportPanel({ context }: { context: any }) {
                     Import
                 </Button>
             </Group>
-            {/* Weergave van ontvangen data */}
             {data && (
                 <Paper mt="md" withBorder p="sm">
                     <Text>Import Results:</Text>
@@ -95,12 +94,7 @@ function ImportPanel({ context }: { context: any }) {
     );
 }
 
-/**
- * Render the ImportPanel component
- * 
- * @param target - The HTML element to render the panel into
- * @param context - The context object to pass to the panel
- */
+// Render de ImportPanel component zonder QueryClientProvider
 export function renderPanel(target: HTMLElement, context: any) {
     createRoot(target).render(
         <MantineProvider>
