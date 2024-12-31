@@ -15,19 +15,22 @@ function ImportPanel({ context }: { context: any }) {
     const IVENTREE_REXEL_URL = "plugin/inventree_rexel/rexel/";
     
     // Query om data op te halen
-    const { data, isError, isLoading, refetch } = useQuery(
-        ['import-data', productNumber, partNumber],
-        async () => {
+    const { data, isError, isLoading, refetch } = useQuery<{ 
+        productNumber: string; 
+        partNumber: string; 
+        status: string; 
+        message: string; 
+    }>({
+        queryKey: ['import-data', productNumber, partNumber],
+        queryFn: async () => {
             const response = await context.api?.post(IVENTREE_REXEL_URL, {
                 productNumber,
                 partNumber,
             });
             return response?.data;
         },
-        {
-            enabled: false, // Alleen uitvoeren als refetch wordt aangeroepen
-        }
-    );
+        enabled: false, // Alleen uitvoeren als refetch wordt aangeroepen
+    });
 
     // Functie om de importactie te triggeren
     const handleImport = async () => {
@@ -79,7 +82,7 @@ function ImportPanel({ context }: { context: any }) {
             {data && (
                 <Paper mt="md" withBorder p="sm">
                     <Text>Import Results:</Text>
-                    <pre>{JSON.stringify(data, null, 2)}</pre>
+                    <pre>{JSON.stringify(data ?? {}, null, 2)}</pre>
                 </Paper>
             )}
         </Paper>
