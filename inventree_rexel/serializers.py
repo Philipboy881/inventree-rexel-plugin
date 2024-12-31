@@ -6,10 +6,10 @@ class RexelRequestSerializer(serializers.Serializer):
     product_number = serializers.CharField(
         max_length=255,
         required=True,
-        source='productNumber'
+        source='product_number'
     )
     part_number = serializers.CharField(
         max_length=255,
         required=True,
-        source='partNumber'
+        source='part_number'
     )
