@@ -194,35 +194,3 @@ print(get_product("", "", "2700201612"))
 
 
 # view the page directly of this product https://www.rexel.nl/nln/Rexel/Industriele-componenten/Transformatoren-en-voedingen/Voedingen/Gelijkstroomvoedingseenheid/Mean-Well-Gelijkstroomvoedingseenheid-sdr20-24-psu-din-24v-5a/p/2700130858
-
-# output
-'''
-{
-    "naam": "Mean Well Gelijkstroomvoedingseenheid sdr20-24 psu din 24v/5a",
-    "product_code": "SDR-120-24",
-    "ean_code": "8720207824477",
-    "sku": "2700130858",
-    "price": "Prijs niet beschikbaar",
-    "omschrijving": "Omschrijving niet beschikbaar",
-    "algemene_informatie": {
-        "Conditie/kortingsgroep": "302474",
-        "UNSPSC Code": "39121004",
-        "Diepte": "113.5 mm",
-        "Secundaire spanning instelbaar": "Nee",
-        "Breedte": "40 mm",
-        "Nom. uitgangsstroom 1": "5 A",
-        "Modulaire uitvoering (voor railmontage)": "Nee",
-        "Nom. voedingsspanning bij AC 50 Hz": "88 - 264 V",
-        "Spanningstype voedingsspanning": "AC/DC",
-        "1e Secundaire spanning": "24 - 28 V",
-        "Nom. voedingsspanning bij DC": "124 - 370 V",
-        "Max. uitgangsstroom 1": "5 A",
-        "Hoogte": "125.2 mm",
-        "Nom. uitgangsspanning 1": "24 V",
-        "Beschermingsgraad (IP)": "IP20",
-        "Vermogensafgifte": "120 W",
-        "Performance Level volgens EN ISO 13849-1": "Geen",
-        "Geschikt voor railmontage": "Ja"
-    }
-}
-'''
