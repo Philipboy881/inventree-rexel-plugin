@@ -1,4 +1,4 @@
-import { Button, Group, Paper, TextInput, MantineProvider, Alert, Text, Spinner } from '@mantine/core';
+import { Button, Group, Paper, TextInput, MantineProvider, Alert, Text, Loader } from '@mantine/core';
 import { IconCloudDownload } from '@tabler/icons-react';
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -51,10 +51,10 @@ function ImportPanel({ context }: { context: any }) {
 
     return (
         <Paper withBorder p="sm" m="sm" pos="relative">
-            {/* Spinner als laadindicator */}
+            {/* Loader als laadindicator */}
             {(isSubmitting || isLoading) && (
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                    <Spinner size="xl" />
+                    <Loader size="xl" />
                 </div>
             )}
 
