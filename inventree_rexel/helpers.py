@@ -99,10 +99,10 @@ def process_rexel_data(data):
     searchbox_url = "https://www.rexel.nl/nln/search/autocomplete/SearchBoxResponsiveComponent?term="
 
     # Haal de product URL en SKU op
-    product_url_sku = get_product_url(part_number, searchbox_url)
+    product_url_sku = get_product_url(product_number, searchbox_url)
     if "error" in product_url_sku:
         return {
-            'status': 'error',
+            'status': 'error in search',
             'message': product_url_sku['error']
         }
 
@@ -112,7 +112,7 @@ def process_rexel_data(data):
     # Controleer of we een foutmelding hebben ontvangen (bijvoorbeeld geen geldige HTML)
     if isinstance(product_data, str) and "error" in product_data:
         return {
-            'status': 'error',
+            'status': 'error in product data',
             'message': product_data  # Geef de foutmelding van de HTML terug
         }
 
