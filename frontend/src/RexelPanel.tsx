@@ -1,81 +1,101 @@
-import { Button, Group, Paper, TextInput, MantineProvider } from '@mantine/core';
+import { Button, Group, Paper, TextInput, MantineProvider, Alert, LoadingOverlay, Text } from '@mantine/core';
 import { IconCloudDownload } from '@tabler/icons-react';
 import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
 
-function ImportPanel({context}: {context: any}) {
+function ImportPanel({ context }: { context: any }) {
     const pluginSettings = useMemo(() => context?.context?.settings ?? {}, [context]);
-    if (!pluginSettings.PURCHASE_ORDER_HISTORY) {
-        console.log("Purchase = false")
-    }
-        
-    
-    // State voor de tekstvelden
+
+    // State voor invoervelden
     const [productNumber, setProductNumber] = useState('');
-    const [partNumber, setpartNumber] = useState('');
+    const [partNumber, setPartNumber] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Functie om importactie te triggeren
-    const handleImport = () => {
-        if (productNumber && partNumber) {
-            
+    const IVENTREE_REXEL_URL = "plugin/inventree_rexel/rexel/";
+    
+    // Query om data op te halen
+    const { data, isError, isLoading, refetch } = useQuery(
+        ['import-data', productNumber, partNumber],
+        async () => {
+            const response = await context.api?.post(IVENTREE_REXEL_URL, {
+                productNumber,
+                partNumber,
+            });
+            return response?.data;
+        },
+        {
+            enabled: false, // Voer de query alleen uit als `refetch` wordt aangeroepen
+        }
+    );
 
+    // Functie om de importactie te triggeren
+    const handleImport = async () => {
+        if (!productNumber || !partNumber) {
+            alert('enter both fields  before import.');
+            return;
+        }
 
-
-
-
-
-
-
-
-
-            console.log('Importeren met:', { productNumber, partNumber });
-            alert(`Gegevens geïmporteerd:\nProduct Nummer: ${productNumber}\nPart Nummer: ${partNumber}`);
-        } else {
-            alert('Vul beide velden in voordat je importeert.');
+        try {
+            setIsSubmitting(true);
+            await refetch();
+        } catch (error) {
+            alert('An error has occurred while getting your data while importing.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     return (
-        <Paper withBorder p="sm" m="sm">
+        <Paper withBorder p="sm" m="sm" pos="relative">
+            <LoadingOverlay visible={isSubmitting || isLoading} overlayBlur={2} />
+            {isError && (
+                <Alert color="red" title="Fout">
+                    An error has occurred while getting your data.
+                </Alert>
+            )}
             <Group gap="xs" grow>
-                {/* Tekstvelden */}
                 <TextInput
-                    label="enter Product ean, sku, type, description"
-                    placeholder="enter product data"
+                    label="Product EAN, SKU, Type of description"
+                    placeholder="enter productgegevens"
                     value={productNumber}
                     onChange={(event) => setProductNumber(event.currentTarget.value)}
                 />
                 <TextInput
-                    label="New internal part nummer"
-                    placeholder="enter new partnummer"
+                    label="New intern partnummer"
+                    placeholder="enter new partnummer in"
                     value={partNumber}
-                    onChange={(event) => setpartNumber(event.currentTarget.value)}
+                    onChange={(event) => setPartNumber(event.currentTarget.value)}
                 />
-                {/* Import knop */}
                 <Button
                     leftSection={<IconCloudDownload />}
                     onClick={handleImport}
+                    disabled={isSubmitting || isLoading}
                 >
                     Importeren
                 </Button>
             </Group>
+            {/* Weergave van ontvangen data */}
+            {data && (
+                <Paper mt="md" withBorder p="sm">
+                    <Text>Import resultaat:</Text>
+                    <pre>{JSON.stringify(data, null, 2)}</pre>
+                </Paper>
+            )}
         </Paper>
     );
 }
 
-
 /**
- * Render the OrderHistoryPanel component
+ * Render de ImportPanel component
  * 
- * @param target - The target HTML element to render the panel into
- * @param context - The context object to pass to the panel
+ * @param target - Het HTML-element waarin het paneel moet worden gerenderd
+ * @param context - Het contextobject dat aan het paneel moet worden doorgegeven
  */
 export function renderPanel(target: HTMLElement, context: any) {
-
     createRoot(target).render(
         <MantineProvider>
-            <ImportPanel context={context}/>
+            <ImportPanel context={context} />
         </MantineProvider>
-    )
-
+    );
 }
