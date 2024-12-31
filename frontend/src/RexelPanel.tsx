@@ -86,8 +86,10 @@ function ImportPanel({ context }: { context: any }) {
             </Group>
             {data && (
                 <Paper mt="md" withBorder p="sm">
-                    <Text>Import Results:</Text>
-                    <pre>{JSON.stringify(data ?? {}, null, 2)}</pre>
+                    <Text size="lg" weight={500} mb="sm">Import Results:</Text>
+                    <Code block>
+                        {JSON.stringify(data ?? {}, null, 2)} {/* Formatteer de JSON met inspringingen */}
+                    </Code>
                 </Paper>
             )}
         </Paper>
