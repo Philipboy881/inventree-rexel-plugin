@@ -15,7 +15,7 @@ function ImportPanel({ context }: { context: any }) {
     const IVENTREE_REXEL_URL = "plugin/inventree_rexel/rexel/";
     
     // Query om data op te halen
-    const { data, isError, isLoading, refetch } = useQuery(
+    const { data, isError, isLoading, refetch } = useQuery<{ productNumber: string; partNumber: string; status: string; message: string }>(
         ['import-data', productNumber, partNumber],
         async () => {
             const response = await context.api?.post(IVENTREE_REXEL_URL, {
@@ -25,7 +25,7 @@ function ImportPanel({ context }: { context: any }) {
             return response?.data;
         },
         {
-            enabled: false, // Voer de query alleen uit als `refetch` wordt aangeroepen
+            enabled: false,
         }
     );
 
@@ -40,7 +40,7 @@ function ImportPanel({ context }: { context: any }) {
             setIsSubmitting(true);
             await refetch();
         } catch (error) {
-            alert('An error has occurred while getting your data while importing.');
+            alert('An error has occurred while getting your data while importing. ' + pluginSettings);
         } finally {
             setIsSubmitting(false);
         }
@@ -48,7 +48,7 @@ function ImportPanel({ context }: { context: any }) {
 
     return (
         <Paper withBorder p="sm" m="sm" pos="relative">
-            <LoadingOverlay visible={isSubmitting || isLoading} overlayBlur={2} />
+            <LoadingOverlay visible={isSubmitting || isLoading} blur={2} />
             {isError && (
                 <Alert color="red" title="Fout">
                     An error has occurred while getting your data.
