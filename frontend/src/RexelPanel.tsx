@@ -1,4 +1,4 @@
-import { Button, Group, Paper, TextInput, MantineProvider, Alert, Text, Loader } from '@mantine/core';
+import { Code, Button, Group, Paper, TextInput, MantineProvider, Alert, Text, Loader } from '@mantine/core';
 import { IconCloudDownload } from '@tabler/icons-react';
 import { useState, useMemo } from 'react';
 import { QueryClient, useQuery } from '@tanstack/react-query'; // Import alleen useQuery en QueryClient
@@ -86,7 +86,7 @@ function ImportPanel({ context }: { context: any }) {
             </Group>
             {data && (
                 <Paper mt="md" withBorder p="sm">
-                    <Text size="lg" weight={500} mb="sm">Import Results:</Text>
+                    <Text size="lg" weight={500} style={{ marginBottom: '1rem' }}>Import Results:</Text> {/* Gebruik style in plaats van mb */}
                     <Code block>
                         {JSON.stringify(data ?? {}, null, 2)} {/* Formatteer de JSON met inspringingen */}
                     </Code>
