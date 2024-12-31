@@ -3,9 +3,34 @@ import requests
 import json
 
 
+def login(session, url, username, password):
+    # Define login URL, username, and password
+    login_data = {
+        "j_username": username,
+        "j_password": password
+    }
+    login_response = session.post(url, data=login_data)
+    # If login fails (status code is not 200), return False
+    if login_response.status_code != 200:
+        return False
+    return session
+
+
+# Function to get the product price
+def get_price(session, url):
+    response = session.get(url)
+
+    if response.status_code != 200:
+        print(f"Error retrieving price: {response.status_code}")
+        sys.exit()
+    
+    data = response.json()
+    return data[0]['price']
+
+
 # Functie om product URL en SKU op te halen (ook van de Rexel-site)
-def get_product_url(sku, url):
-    response = requests.get(url + sku)
+def get_product_url(session, sku, url):
+    response = session.get(url + sku)
     if response.status_code != 200:
         return {"error": f"Error retrieving product URL: {response.status_code}"}
     
@@ -22,8 +47,8 @@ def get_product_url(sku, url):
 
 
 # Functie om productgegevens op te halen van een URL
-def get_product_data(url):
-    response = requests.get(url)
+def get_product_data(session, url):
+    response = session.get(url)
     if response.status_code != 200:
         return {"error": f"Error retrieving product data: {response.status_code}"}
     
@@ -94,12 +119,34 @@ def process_rexel_data(data):
     product_number = data['product_number']
     part_number = data['part_number']
 
-    # URL's voor het ophalen van de productgegevens
+    username = ""
+    password = ""
+
     base_url = "https://www.rexel.nl/nln"
+    login_url = "https://www.rexel.nl/nln/j_spring_security_check"
+    price_url = "https://www.rexel.nl/nln/erp/getPrice.json?products="
+    price_url1 = "&isListPage=false&isProductBundle=false&context=PDP&isLeasingProductPresent=false"
     searchbox_url = "https://www.rexel.nl/nln/search/autocomplete/SearchBoxResponsiveComponent?term="
 
+    # Create a session object to manage cookies and headers
+    session = requests.Session()
+
+    # Only login if username and password are provided (for price retrieval)
+    if username and password:
+        session = login(session, login_url, username, password)
+        if session is False:
+            print("Login failed, cannot retrieve price.")
+            price = "Price not available"
+        else:
+            # Retrieve the price with the logged-in session
+            price = get_price(session, price_url + product + price_url1)
+            print("Price:", price)
+    else:
+        price = "Price not available"  # No login credentials, so no price retrieval
+
+
     # Haal de product URL en SKU op
-    product_url_sku = get_product_url(product_number, searchbox_url)
+    product_url_sku = get_product_url(session, product_number, searchbox_url)
     if "error" in product_url_sku:
         return {
             'status': 'error in search',
@@ -107,7 +154,7 @@ def process_rexel_data(data):
         }
 
     # Haal de productgegevens op van de URL
-    product_data = get_product_data(base_url + product_url_sku["url"])
+    product_data = get_product_data(session, base_url + product_url_sku["url"])
 
     # Controleer of we een foutmelding hebben ontvangen (bijvoorbeeld geen geldige HTML)
     if isinstance(product_data, str) and "error" in product_data:
