@@ -197,4 +197,4 @@ def process_rexel_data(data):
     product_number = data['product_number']
     # part_number = data['part_number']
 
-    return get_product("", "", "product_number")
+    return get_product("", "", product_number)
