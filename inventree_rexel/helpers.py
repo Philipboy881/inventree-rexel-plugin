@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 import json
+import sys
 
 
 def login(session, url, username, password):
@@ -139,11 +140,10 @@ def process_rexel_data(data):
             price = "Price not available"
         else:
             # Retrieve the price with the logged-in session
-            price = get_price(session, price_url + product + price_url1)
+            price = get_price(session, price_url + product_number + price_url1)
             print("Price:", price)
     else:
         price = "Price not available"  # No login credentials, so no price retrieval
-
 
     # Haal de product URL en SKU op
     product_url_sku = get_product_url(session, product_number, searchbox_url)
