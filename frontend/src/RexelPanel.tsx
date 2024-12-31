@@ -10,24 +10,24 @@ const queryClient = new QueryClient();
 function ImportPanel({ context }: { context: any }) {
     const pluginSettings = useMemo(() => context?.context?.settings ?? {}, [context]);
 
-    const [productNumber, setProductNumber] = useState('');
-    const [partNumber, setPartNumber] = useState('');
+    const [product_number, setproduct_number] = useState('');
+    const [part_number, setpart_number] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const IVENTREE_REXEL_URL = "plugin/inventree_rexel/rexel/";
 
     // Geef de queryClient door aan useQuery
     const { data, isError, isLoading, refetch } = useQuery<{ 
-        productNumber: string; 
-        partNumber: string; 
+        product_number: string; 
+        part_number: string; 
         status: string; 
         message: string; 
     }>({
-        queryKey: ['import-data', productNumber, partNumber],
+        queryKey: ['import-data', product_number, part_number],
         queryFn: async () => {
             const response = await context.api?.post(IVENTREE_REXEL_URL, {
-                productNumber,
-                partNumber,
+                product_number,
+                part_number,
             });
             return response?.data;
         },
@@ -35,7 +35,7 @@ function ImportPanel({ context }: { context: any }) {
     }, queryClient); // Het doorgeven van queryClient hier
 
     const handleImport = async () => {
-        if (!productNumber || !partNumber) {
+        if (!product_number || !part_number) {
             alert('Enter both fields before import.');
             return;
         }
@@ -67,14 +67,14 @@ function ImportPanel({ context }: { context: any }) {
                 <TextInput
                     label="Product EAN, SKU, Type of description"
                     placeholder="Enter product data"
-                    value={productNumber}
-                    onChange={(event) => setProductNumber(event.currentTarget.value)}
+                    value={product_number}
+                    onChange={(event) => setproduct_number(event.currentTarget.value)}
                 />
                 <TextInput
                     label="New internal part number"
                     placeholder="Enter new part number"
-                    value={partNumber}
-                    onChange={(event) => setPartNumber(event.currentTarget.value)}
+                    value={part_number}
+                    onChange={(event) => setpart_number(event.currentTarget.value)}
                 />
                 <Button
                     leftSection={<IconCloudDownload />}
