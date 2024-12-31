@@ -1,4 +1,4 @@
-import { Button, Group, Paper, TextInput, MantineProvider, Alert, LoadingOverlay, Text } from '@mantine/core';
+import { Button, Group, Paper, TextInput, MantineProvider, Alert, Text, Spinner } from '@mantine/core';
 import { IconCloudDownload } from '@tabler/icons-react';
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -15,22 +15,19 @@ function ImportPanel({ context }: { context: any }) {
     const IVENTREE_REXEL_URL = "plugin/inventree_rexel/rexel/";
     
     // Query om data op te halen
-    const { data, isError, isLoading, refetch } = useQuery<{ 
-        productNumber: string; 
-        partNumber: string; 
-        status: string; 
-        message: string; 
-    }>({
-        queryKey: ['import-data', productNumber, partNumber],
-        queryFn: async () => {
+    const { data, isError, isLoading, refetch } = useQuery<{ productNumber: string; partNumber: string; status: string; message: string }>(
+        ['import-data', productNumber, partNumber],
+        async () => {
             const response = await context.api?.post(IVENTREE_REXEL_URL, {
                 productNumber,
                 partNumber,
             });
             return response?.data;
         },
-        enabled: false, // Alleen uitvoeren als refetch wordt aangeroepen
-    });
+        {
+            enabled: false, // Voer de query alleen uit als `refetch` wordt aangeroepen
+        }
+    );
 
     // Functie om de importactie te triggeren
     const handleImport = async () => {
@@ -51,22 +48,28 @@ function ImportPanel({ context }: { context: any }) {
 
     return (
         <Paper withBorder p="sm" m="sm" pos="relative">
-            <LoadingOverlay visible={isSubmitting || isLoading} overlayBlur={2} />
+            {/* Spinner als laadindicator */}
+            {(isSubmitting || isLoading) && (
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                    <Spinner size="xl" />
+                </div>
+            )}
+
             {isError && (
-                <Alert color="red" title="Error">
+                <Alert color="red" title="Fout">
                     An error has occurred while getting your data.
                 </Alert>
             )}
             <Group gap="xs" grow>
                 <TextInput
                     label="Product EAN, SKU, Type of description"
-                    placeholder="Enter product data"
+                    placeholder="Enter productgegevens"
                     value={productNumber}
                     onChange={(event) => setProductNumber(event.currentTarget.value)}
                 />
                 <TextInput
-                    label="New internal part number"
-                    placeholder="Enter new part number"
+                    label="New intern partnummer"
+                    placeholder="Enter new partnummer"
                     value={partNumber}
                     onChange={(event) => setPartNumber(event.currentTarget.value)}
                 />
@@ -75,14 +78,15 @@ function ImportPanel({ context }: { context: any }) {
                     onClick={handleImport}
                     disabled={isSubmitting || isLoading}
                 >
-                    Import
+                    Importeren
                 </Button>
             </Group>
+            
             {/* Weergave van ontvangen data */}
             {data && (
                 <Paper mt="md" withBorder p="sm">
-                    <Text>Import Results:</Text>
-                    <pre>{JSON.stringify(data ?? {}, null, 2)}</pre>
+                    <Text>Import resultaat:</Text>
+                    <pre>{JSON.stringify(data, null, 2)}</pre>
                 </Paper>
             )}
         </Paper>
@@ -90,10 +94,10 @@ function ImportPanel({ context }: { context: any }) {
 }
 
 /**
- * Render the ImportPanel component
+ * Render de ImportPanel component
  * 
- * @param target - The HTML element to render the panel into
- * @param context - The context object to pass to the panel
+ * @param target - Het HTML-element waarin het paneel moet worden gerenderd
+ * @param context - Het contextobject dat aan het paneel moet worden doorgegeven
  */
 export function renderPanel(target: HTMLElement, context: any) {
     createRoot(target).render(
