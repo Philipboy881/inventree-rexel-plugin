@@ -15,7 +15,7 @@ function ImportPanel({ context }: { context: any }) {
     const IVENTREE_REXEL_URL = "plugin/inventree_rexel/rexel/";
     
     // Query om data op te halen
-    const { data, isError, isLoading, refetch } = useQuery<{ productNumber: string; partNumber: string; status: string; message: string }>(
+    const { data, isError, isLoading, refetch } = useQuery(
         ['import-data', productNumber, partNumber],
         async () => {
             const response = await context.api?.post(IVENTREE_REXEL_URL, {
@@ -25,14 +25,14 @@ function ImportPanel({ context }: { context: any }) {
             return response?.data;
         },
         {
-            enabled: false,
+            enabled: false, // Alleen uitvoeren als refetch wordt aangeroepen
         }
     );
 
     // Functie om de importactie te triggeren
     const handleImport = async () => {
         if (!productNumber || !partNumber) {
-            alert('enter both fields  before import.');
+            alert('Enter both fields before import.');
             return;
         }
 
@@ -48,22 +48,22 @@ function ImportPanel({ context }: { context: any }) {
 
     return (
         <Paper withBorder p="sm" m="sm" pos="relative">
-            <LoadingOverlay visible={isSubmitting || isLoading} blur={2} />
+            <LoadingOverlay visible={isSubmitting || isLoading} overlayBlur={2} />
             {isError && (
-                <Alert color="red" title="Fout">
+                <Alert color="red" title="Error">
                     An error has occurred while getting your data.
                 </Alert>
             )}
             <Group gap="xs" grow>
                 <TextInput
                     label="Product EAN, SKU, Type of description"
-                    placeholder="enter productgegevens"
+                    placeholder="Enter product data"
                     value={productNumber}
                     onChange={(event) => setProductNumber(event.currentTarget.value)}
                 />
                 <TextInput
-                    label="New intern partnummer"
-                    placeholder="enter new partnummer in"
+                    label="New internal part number"
+                    placeholder="Enter new part number"
                     value={partNumber}
                     onChange={(event) => setPartNumber(event.currentTarget.value)}
                 />
@@ -72,13 +72,13 @@ function ImportPanel({ context }: { context: any }) {
                     onClick={handleImport}
                     disabled={isSubmitting || isLoading}
                 >
-                    Importeren
+                    Import
                 </Button>
             </Group>
             {/* Weergave van ontvangen data */}
             {data && (
                 <Paper mt="md" withBorder p="sm">
-                    <Text>Import resultaat:</Text>
+                    <Text>Import Results:</Text>
                     <pre>{JSON.stringify(data, null, 2)}</pre>
                 </Paper>
             )}
@@ -87,10 +87,10 @@ function ImportPanel({ context }: { context: any }) {
 }
 
 /**
- * Render de ImportPanel component
+ * Render the ImportPanel component
  * 
- * @param target - Het HTML-element waarin het paneel moet worden gerenderd
- * @param context - Het contextobject dat aan het paneel moet worden doorgegeven
+ * @param target - The HTML element to render the panel into
+ * @param context - The context object to pass to the panel
  */
 export function renderPanel(target: HTMLElement, context: any) {
     createRoot(target).render(
