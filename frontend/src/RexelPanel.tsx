@@ -5,9 +5,11 @@ import { createRoot } from 'react-dom/client';
 
 function ImportPanel({context}: {context: any}) {
     const pluginSettings = useMemo(() => context?.context?.settings ?? {}, [context]);
-    if (!context?.user?.hasViewRole('purchase_order')) {
-        console.log("has view role")
+    if (!pluginSettings.PURCHASE_ORDER_HISTORY) {
+        console.log("Purchase = false")
     }
+        
+    
     // State voor de tekstvelden
     const [productNumber, setProductNumber] = useState('');
     const [pastNumber, setPastNumber] = useState('');
