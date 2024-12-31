@@ -21,13 +21,14 @@ def get_product_url(sku, url):
         return {"error": "No product data found in the response."}
 
 
+
 # Functie om productgegevens op te halen van een URL
 def get_product_data(url):
     response = requests.get(url)
     if response.status_code != 200:
         return {"error": f"Error retrieving product data: {response.status_code}"}
     
-    return response.text
+    return response.text  # Dit is de HTML van de pagina
 
 
 # Functie om tabeldata van de productpagina te extraheren
@@ -108,10 +109,12 @@ def process_rexel_data(data):
 
     # Haal de productgegevens op van de URL
     product_data = get_product_data(base_url + product_url_sku["url"])
-    if "error" in product_data:
+
+    # Controleer of we een foutmelding hebben ontvangen (bijvoorbeeld geen geldige HTML)
+    if isinstance(product_data, str) and "error" in product_data:
         return {
             'status': 'error',
-            'message': product_data['error']
+            'message': product_data  # Geef de foutmelding van de HTML terug
         }
 
     # Verkrijg gestructureerde gegevens van de HTML
