@@ -21,7 +21,6 @@ def get_product_url(sku, url):
         return {"error": "No product data found in the response."}
 
 
-
 # Functie om productgegevens op te halen van een URL
 def get_product_data(url):
     response = requests.get(url)
