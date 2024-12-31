@@ -190,7 +190,7 @@ def get_product(username, password, product):
 
 
 # Run the program
-print(get_product("", "", "8720207824477"))
+print(get_product("", "", "2700201612"))
 
 
 # view the page directly of this product https://www.rexel.nl/nln/Rexel/Industriele-componenten/Transformatoren-en-voedingen/Voedingen/Gelijkstroomvoedingseenheid/Mean-Well-Gelijkstroomvoedingseenheid-sdr20-24-psu-din-24v-5a/p/2700130858
