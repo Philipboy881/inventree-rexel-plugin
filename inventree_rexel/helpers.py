@@ -216,7 +216,6 @@ def process_rexel_data(data):
 
     data = get_product("", "", product_number)
     
-    
     manufacturers = get_all_manufacturers()
 
     if manufacturers:
