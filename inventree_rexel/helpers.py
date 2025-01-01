@@ -31,31 +31,32 @@ def create_part(data, manufacturer_id, supplier_id, internal_part_number):
     """
 
     # Verkrijg de productinformatie uit de data
-    product_number = data.get("product number", None)
-    part_number = data.get("code", None)  # Code wordt gebruikt als part number
     name = data.get("name", None)
     description = data.get("description", "")
     brand = data.get("brand", None)
-    ean = data.get("ean", None)  # EAN gebruiken als scan code
+    # ean = data.get("ean", None)  # EAN gebruiken als scan code
     unit = data.get("unit", None)
     image_url = data.get("image url", None)
-    url = data.get("url", None)
+    # url = data.get("url", None)
     # general_info = data.get("general_information", {})
+    manufacturerpartnr = data.get("product number", None)
+    supplierpartnr = data.get("code", None)
 
     # Maak het onderdeel aan in je systeem (bijv. door een database model te gebruiken)
     part = Part.objects.create(
-        product_number=product_number,
-        part_number=part_number,
         internal_part_number=internal_part_number,  # Internal Part Number (IPN)
         name=name,
         description=description,
         brand=brand,
-        manufacturer_id=manufacturer_id,  # Fabrikant ID
-        supplier_id=supplier_id,  # Leverancier ID
-        ean=ean,  # EAN als scan code
-        unit=unit,
-        image_url=image_url,
-        url=url,
+        manufacturer=manufacturer_id,  # Fabrikant ID
+        sku=supplierpartnr,
+        supplier=supplier_id,  # Leverancier ID
+        mpn=manufacturerpartnr,
+        default_supplier=supplier_id,
+        # ean=ean,  # EAN als scan code
+        units=unit,
+        remote_image=image_url,
+        # url=url,
     )
 
     return part.id  # Retourneer de ID van het aangemaakte part
