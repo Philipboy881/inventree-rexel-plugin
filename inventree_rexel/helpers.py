@@ -28,6 +28,7 @@ def fetch_all_manufacturers():
 
     return manufacturers
 
+
 # Functie om een fabrikant-ID op te zoeken op basis van naam
 def find_manufacturer_id(manufacturers, name):
     # Zet de naam om naar kleine letters voor hoofdletterongevoelig zoeken
@@ -42,7 +43,7 @@ def find_manufacturer_id(manufacturers, name):
 
 # Login function to authenticate the user
 def login(session, url, username, password):
-# Define login URL, username, and password
+    # Define login URL, username, and password
     login_data = {
         "j_username": username,
         "j_password": password
@@ -86,9 +87,9 @@ def search_product(session, search_data, url):
         product_image_url = product["images"][0].get('url', 'Image not available')
         product_brandname = product.get('brandName', 'brand not available')
         product_ean = product.get('ean', 'ean not available')
-        product_numberContentUnits = product.get('numberContentUnits', 'numbercontentunits not available')  # eenheid
-        product_manufacturerAID	= product.get('manufacturerAID', 'manufactureraid not available')  # product type
-        product_pricingQty = product.get('pricingQty', 'pricingqty  not available')
+        product_numbercontentunits = product.get('numberContentUnits', 'numbercontentunits not available')  # eenheid
+        product_manufactureraid = product.get('manufacturerAID', 'manufactureraid not available')  # product type
+        product_pricingqty = product.get('pricingQty', 'pricingqty  not available')
         # Return the product URL and code
         returndata = {
             "code": product_code,
@@ -97,9 +98,9 @@ def search_product(session, search_data, url):
             "image url": product_image_url,
             "brand": product_brandname,
             "ean": product_ean,
-            "unit": product_numberContentUnits,
-            "product number": product_manufacturerAID,
-            "number of units": product_pricingQty 
+            "unit": product_numbercontentunits,
+            "product number": product_manufactureraid,
+            "number of units": product_pricingqty
         }
         return returndata
     else:
@@ -226,15 +227,16 @@ def process_rexel_data(data):
     data = get_product("", "", product_number)
     return data
     # manufacturers = fetch_all_manufacturers()
-
-    # if manufacturers:
+    """
+    if manufacturers:
         # Zoek een fabrikant op basis van naam
-        # search_name = "Voorbeeld Naam"  # Vervang door de naam waar je naar wilt zoeken
-        # manufacturer_id = find_manufacturer_id(manufacturers, search_name)
+        search_name = "Voorbeeld Naam"  # Vervang door de naam waar je naar wilt zoeken
+        manufacturer_id = find_manufacturer_id(manufacturers, search_name)
 
-        # if manufacturer_id:
-            # return f"Fabrikant '{search_name}' gevonden met ID: {manufacturer_id}"
-        #else:
-            # return f"Fabrikant '{search_name}' niet gevonden."
-    # else:
-        # return "Geen fabrikanten gevonden."
+        if manufacturer_id:
+            return f"Fabrikant '{search_name}' gevonden met ID: {manufacturer_id}"
+        else:
+            return f"Fabrikant '{search_name}' niet gevonden."
+    else:
+        return "Geen fabrikanten gevonden."
+    """

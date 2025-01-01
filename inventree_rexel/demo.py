@@ -51,8 +51,8 @@ def search_product(session, search_data, url):
         product_brandname = product.get('brandName', 'brand not available')
         product_ean = product.get('ean', 'ean not available')
         product_numberContentUnits = product.get('numberContentUnits', 'numbercontentunits not available')  # eenheid
-        product_manufacturerAID	= product.get('manufacturerAID', 'manufactureraid not available')  # product type
-        product_pricingQty = product.get('pricingQty', 'pricingqty  not available')
+        product_manufactureraid = product.get('manufacturerAID', 'manufactureraid not available')  # product type
+        product_pricingqty = product.get('pricingQty', 'pricingqty  not available')
         # Return the product URL and code
         returndata = {
             "code": product_code,
@@ -62,8 +62,8 @@ def search_product(session, search_data, url):
             "brand": product_brandname,
             "ean": product_ean,
             "unit": product_numberContentUnits,
-            "product number": product_manufacturerAID,
-            "number of units": product_pricingQty 
+            "product number": product_manufactureraid,
+            "number of units": product_pricingqty
         }
         return returndata
     else:
