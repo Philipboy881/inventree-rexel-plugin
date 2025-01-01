@@ -255,6 +255,5 @@ def process_rexel_data(data):
 
     part_id = create_part(data, manufacturer_id, rexel_id, internal_part_number)
 
-
     return part_id
     return json.dumps(data, indent=4, ensure_ascii=False)
