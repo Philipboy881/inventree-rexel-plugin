@@ -6,6 +6,7 @@ import sys
 BASE_URL = "https://philipboy88.com/api/"
 
 
+"""
 def fetch_all_manufacturers():
     url = BASE_URL + "company/"
     manufacturers = []
@@ -27,6 +28,7 @@ def fetch_all_manufacturers():
         page += 1
 
     return manufacturers
+"""
 
 
 # Functie om een fabrikant-ID op te zoeken op basis van naam
