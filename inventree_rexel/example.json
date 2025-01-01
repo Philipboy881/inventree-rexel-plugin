@@ -1,0 +1,104 @@
+
+POST
+	https://inventree.philipboy88.com/api/part/
+    {
+        "active": true,
+        "assembly": true,
+        "category": 0,
+        "component": true,
+        "creation_user": 0,
+        "default_expiry": 0,
+        "default_location": 0,
+        "default_supplier": 0,
+        "description": "string",
+        "image": "http://example.com",
+        "remote_image": "http://example.com",
+        "existing_image": "string",
+        "IPN": "",
+        "is_template": true,
+        "keywords": "string",
+        "last_stocktake": "2019-08-24",
+        "link": "http://example.com",
+        "locked": true,
+        "minimum_stock": 0.1,
+        "name": "string",
+        "purchaseable": true,
+        "revision": "",
+        "revision_of": 0,
+        "salable": true,
+        "testable": true,
+        "trackable": true,
+        "units": "string",
+        "variant_of": 0,
+        "virtual": true,
+        "responsible": 0,
+        "duplicate": {
+          "part": 0,
+          "copy_image": false,
+          "copy_bom": false,
+          "copy_parameters": false,
+          "copy_notes": true
+        },
+        "initial_stock": {
+          "quantity": "^-?\\(?:\\.\\)?$",
+          "location": 0
+        },
+        "initial_supplier": {
+          "supplier": 0,
+          "sku": "string",
+          "manufacturer": 0,
+          "mpn": "string"
+        },
+        "copy_category_parameters": true,
+        "tags": [
+          "string"
+        ]
+      }
+
+response
+
+{
+	"active": true,
+	"assembly": false,
+	"barcode_hash": "",
+	"category": 1,
+	"category_name": "elektrisch",
+	"component": true,
+	"creation_date": "2024-12-31",
+	"creation_user": 2,
+	"default_expiry": 0,
+	"default_location": null,
+	"default_supplier": null,
+	"description": "des",
+	"full_name": "123 | test",
+	"image": null,
+	"IPN": "123",
+	"is_template": false,
+	"keywords": "key",
+	"last_stocktake": null,
+	"link": "",
+	"locked": false,
+	"minimum_stock": 0,
+	"name": "test",
+	"pk": 136,
+	"purchaseable": true,
+	"revision": "",
+	"revision_of": null,
+	"salable": false,
+	"starred": false,
+	"thumbnail": "/static/img/blank_image.thumbnail.png",
+	"testable": false,
+	"trackable": false,
+	"units": "stk",
+	"variant_of": null,
+	"virtual": false,
+	"pricing_min": null,
+	"pricing_max": null,
+	"pricing_updated": null,
+	"responsible": null,
+	"copy_category_parameters": true,
+	"tags": []
+}
+
+
+"{\n    \"name\": \"Phoenix Contact Quint UPS 1AC/1AC/500VA 2.2kg 2320270\",\n    \"product_code\": \"2320270\",\n    \"ean_code\": \"4046356560078\",\n    \"sku\": \"2700201612\",\n    \"price\": \"Price not available\",\n    \"description\": \"Onderbrekingsvrije voeding met IQ-technologie 1AC/1AC/500 VA. Voor 120 V AC/230 V AC-toepassingen. Geeft op elk moment uitsluitsel over de laadtoestand, resterende looptijd en levensduur van het accumoduul en verhoogt zo de beschikbaarheid van de installa\",\n    \"general_information\": {\n        \"Conditie/kortingsgroep\": \"121010\",\n        \"UNSPSC Code\": \"43222600\",\n        \"Overbruggingstijd vollast\": \"3600 min\",\n        \"Uitgangsspanning\": \"120 - 120 V\",\n        \"Hoogte\": \"130 mm\",\n        \"Breedte\": \"125 mm\",\n        \"Ingangsspanning\": \"96 - 264 V\",\n        \"Diepte\": \"125 mm\",\n        \"Gewicht\": \"2.2 kg\",\n        \"Spanningstype\": \"AC\"\n    }\n}" 

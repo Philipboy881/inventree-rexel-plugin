@@ -3,10 +3,46 @@ import requests
 import json
 import sys
 
+BASE_URL = "https://philipboy88.com/api/"
+
+
+def fetch_all_manufacturers():
+    url = BASE_URL + "company/"
+    manufacturers = []
+    page = 1
+
+    while True:
+        response = requests.get(url, headers=HEADERS, params={"page": page})
+        
+        if response.status_code != 200:
+            print(f"Fout bij het ophalen van fabrikanten: {response.status_code}")
+            return []
+        
+        data = response.json()
+        manufacturers.extend(data["results"])  # Voeg fabrikanten van deze pagina toe
+
+        if not data["next"]:  # Controleer of er een volgende pagina is
+            break
+        
+        page += 1
+
+    return manufacturers
+
+# Functie om een fabrikant-ID op te zoeken op basis van naam
+def find_manufacturer_id(manufacturers, name):
+    # Zet de naam om naar kleine letters voor hoofdletterongevoelig zoeken
+    name_lower = name.lower()
+
+    for manufacturer in manufacturers:
+        if manufacturer["name"].lower() == name_lower:
+            return manufacturer["pk"]  # Primaire sleutel van de fabrikant
+
+    return None  # Geen match gevonden
+
 
 # Login function to authenticate the user
 def login(session, url, username, password):
-    # Define login URL, username, and password
+# Define login URL, username, and password
     login_data = {
         "j_username": username,
         "j_password": password
@@ -31,29 +67,40 @@ def get_price(session, url):
 
 
 # Function to get the product URL and SKU from the search result
-def get_product_url(session, sku, url):
-    response = session.get(url + sku)
+def search_product(session, search_data, url):
+    response = session.get(url + search_data)
     if response.status_code != 200:
         print(f"Error retrieving product URL: {response.status_code}")
         sys.exit()
 
     data = response.json()
-
     # Check if products exist in the response
     if 'products' in data and len(data['products']) > 0:
         # Get the first product
         product = data['products'][0]
 
         # Retrieve 'url' and 'code' for the product
-        product_url = product.get('url', 'URL not available')
         product_code = product.get('code', 'Code not available')
-
+        product_name = product.get('name', 'Name not available')
+        product_url = product.get('url', 'URL not available')
+        product_image_url = product["images"][0].get('url', 'Image not available')
+        product_brandname = product.get('brandName', 'brand not available')
+        product_ean = product.get('ean', 'ean not available')
+        product_numberContentUnits = product.get('numberContentUnits', 'numbercontentunits not available')  # eenheid
+        product_manufacturerAID	= product.get('manufacturerAID', 'manufactureraid not available')  # product type
+        product_pricingQty = product.get('pricingQty', 'pricingqty  not available')
         # Return the product URL and code
         returndata = {
+            "code": product_code,
+            "name": product_name,
             "url": product_url,
-            "code": product_code
+            "image url": product_image_url,
+            "brand": product_brandname,
+            "ean": product_ean,
+            "unit": product_numberContentUnits,
+            "product number": product_manufacturerAID,
+            "number of units": product_pricingQty 
         }
-
         return returndata
     else:
         print("No product data found in the response.")
@@ -107,25 +154,9 @@ def extract_table_data(tables):
 
 
 # Function to get structured data from the product HTML
-def get_data_from_html(html, price, sku):
+def get_data_from_html(html):
     # Create a BeautifulSoup object to parse the HTML
     soup = BeautifulSoup(html, "html.parser")
-
-    # Extract the product name
-    product_name = soup.find("h1", class_="font-weight-bold mb-1")
-    cleaned_product_name = product_name.get_text(strip=True) if product_name else "Name not available"
-    
-    # Extract the product codes (product code and EAN)
-    delivery_numbers = soup.find_all("div", class_="col-auto pl-0 col-md-auto p-md-0 font-weight-bold word-break")
-    cleaned_delivery_numbers = [delivery_number.get_text(strip=True) for delivery_number in delivery_numbers]
-    
-    # Split the delivery numbers into product_code and ean_code
-    if len(cleaned_delivery_numbers) > 1:
-        product_code = cleaned_delivery_numbers[0]
-        ean_code = cleaned_delivery_numbers[1]
-    else:
-        product_code = cleaned_delivery_numbers[0] if cleaned_delivery_numbers else "Code not available"
-        ean_code = "EAN not available"
 
     # Extract the product description
     product_description = soup.find("div", class_="long-product-description")
@@ -140,17 +171,12 @@ def get_data_from_html(html, price, sku):
 
     # Return the data in a structured JSON format
     data = {
-        "name": cleaned_product_name,
-        "product_code": product_code,
-        "ean_code": ean_code,
-        "sku": sku,
-        "price": price,
         "description": cleaned_product_description,
         "general_information": general_info,
     }
 
     # Convert the data to a JSON string and return it
-    return json.dumps(data, indent=4)
+    return data
 
 
 # Main function to get product data and price
@@ -178,15 +204,15 @@ def get_product(username, password, product):
         price = "Price not available"  # No login credentials, so no price retrieval
 
     # Retrieve the product URL and SKU without login
-    product_url_sku = get_product_url(session, product, searchbox_url)
-    
+    product_data = search_product(session, product, searchbox_url)
+
     # Retrieve the product data
-    product_data = get_product_data(session, base_url + product_url_sku["url"])
+    product_scraped_data = get_product_data(session, base_url + product_data["url"])
 
     # Convert the data to structured JSON
-    data = get_data_from_html(product_data, price, product_url_sku['code'])
-    
-    return data
+    product_scraped_data_processed = get_data_from_html(product_scraped_data)
+    rdata = {**product_data, **product_scraped_data_processed}
+    return json.dumps(rdata, indent=4, ensure_ascii=False)
 
 
 # Functie om Rexel data te verwerken en productinformatie op te halen
@@ -197,4 +223,18 @@ def process_rexel_data(data):
     product_number = data['product_number']
     # part_number = data['part_number']
 
-    return get_product("", "", product_number)
+    data = get_product("", "", product_number)
+    return data
+    # manufacturers = fetch_all_manufacturers()
+
+    # if manufacturers:
+        # Zoek een fabrikant op basis van naam
+        # search_name = "Voorbeeld Naam"  # Vervang door de naam waar je naar wilt zoeken
+        # manufacturer_id = find_manufacturer_id(manufacturers, search_name)
+
+        # if manufacturer_id:
+            # return f"Fabrikant '{search_name}' gevonden met ID: {manufacturer_id}"
+        #else:
+            # return f"Fabrikant '{search_name}' niet gevonden."
+    # else:
+        # return "Geen fabrikanten gevonden."
