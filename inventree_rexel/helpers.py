@@ -3,22 +3,62 @@ import requests
 import json
 import sys
 from company.models import Company
+from part.models import Part
 
 BASE_URL = "https://philipboy88.com/api/"
 
 
 # Functie om een fabrikant-ID op te zoeken op basis van naam
-def find_or_create_manufacturer(name):
+def find_or_create_company(name):
     # Zet de naam om naar kleine letters voor hoofdletterongevoelige zoekopdracht
     manufacturer_name_lower = name.lower()
 
     # Zoek naar de fabrikant op basis van de naam (hoofdletterongevoelig)
     manufacturer, created = Company.objects.get_or_create(
         name__iexact=manufacturer_name_lower,  # case-insensitive match voor de naam
-        defaults={"is_manufacturer": True}  # Voeg standaardwaarden toe als de fabrikant nieuw is
+        defaults={"name": manufacturer_name_lower, "is_manufacturer": True, "is supplier": False}  # Voeg standaardwaarden toe als de fabrikant nieuw is
     )
 
     return manufacturer.id  # Retourneer de id van de fabrikant
+
+
+# functie voor onderdelen aan te maken in het systeem
+def create_part(data, manufacturer_id, supplier_id, internal_part_number):
+    """
+    Maak een nieuw onderdeel aan in het systeem op basis van de ontvangen data.
+    De Internal Part Number (IPN) wordt toegevoegd, evenals de EAN als scan code.
+    Zorg ervoor dat je de fabrikant- en leverancier-ID doorgeeft.
+    """
+
+    # Verkrijg de productinformatie uit de data
+    product_number = data.get("product number", None)
+    part_number = data.get("code", None)  # Code wordt gebruikt als part number
+    name = data.get("name", None)
+    description = data.get("description", "")
+    brand = data.get("brand", None)
+    ean = data.get("ean", None)  # EAN gebruiken als scan code
+    unit = data.get("unit", None)
+    image_url = data.get("image url", None)
+    url = data.get("url", None)
+    # general_info = data.get("general_information", {})
+
+    # Maak het onderdeel aan in je systeem (bijv. door een database model te gebruiken)
+    part = Part.objects.create(
+        product_number=product_number,
+        part_number=part_number,
+        internal_part_number=internal_part_number,  # Internal Part Number (IPN)
+        name=name,
+        description=description,
+        brand=brand,
+        manufacturer_id=manufacturer_id,  # Fabrikant ID
+        supplier_id=supplier_id,  # Leverancier ID
+        ean=ean,  # EAN als scan code
+        unit=unit,
+        image_url=image_url,
+        url=url,
+    )
+
+    return part.id  # Retourneer de ID van het aangemaakte part
 
 
 # Login function to authenticate the user
@@ -201,14 +241,20 @@ def process_rexel_data(data):
     """
     Verwerk Rexel data en geef een resultaat terug.
     """
+    # rexel id
+    rexel_id = find_or_create_company("rexel")
+
     product_number = data['product_number']
-    # part_number = data['part_number']
+    internal_part_number = data['part_number']
 
     data = get_product("", "", product_number)
     
-    # Zoek een fabrikant op basis van naam
+    # Zoek een fabrikant op basis van naam en anders creeren
     manufacturer = data["brand"]
-    manufacturer_id = find_or_create_manufacturer(manufacturer)
+    manufacturer_id = find_or_create_company(manufacturer)
 
-    return manufacturer_id
+    part_id = create_part(data, manufacturer_id, rexel_id, internal_part_number)
+
+
+    return part_id
     return json.dumps(data, indent=4, ensure_ascii=False)
