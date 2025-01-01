@@ -2,33 +2,21 @@ from bs4 import BeautifulSoup
 import requests
 import json
 import sys
+from company.models import Company
 
 BASE_URL = "https://philipboy88.com/api/"
 
 
-"""
-def fetch_all_manufacturers():
-    url = BASE_URL + "company/"
-    manufacturers = []
-    page = 1
+def get_all_manufacturers(self):
+    # Query alle fabrikanten in de database
+    manufacturers = Company.objects.filter(is_manufacturer=True)
 
-    while True:
-        response = requests.get(url, headers=HEADERS, params={"page": page})
-        
-        if response.status_code != 200:
-            print(f"Fout bij het ophalen van fabrikanten: {response.status_code}")
-            return []
-        
-        data = response.json()
-        manufacturers.extend(data["results"])  # Voeg fabrikanten van deze pagina toe
-
-        if not data["next"]:  # Controleer of er een volgende pagina is
-            break
-        
-        page += 1
-
-    return manufacturers
-"""
+    # Converteer naar een lijst van dictionaries
+    manufacturer_data = [
+        {"id": manufacturer.id, "name": manufacturer.name}
+        for manufacturer in manufacturers
+    ]
+    return manufacturer_data
 
 
 # Functie om een fabrikant-ID op te zoeken op basis van naam
@@ -215,7 +203,7 @@ def get_product(username, password, product):
     # Convert the data to structured JSON
     product_scraped_data_processed = get_data_from_html(product_scraped_data)
     rdata = {**product_data, **product_scraped_data_processed}
-    return json.dumps(rdata, indent=4, ensure_ascii=False)
+    return rdata
 
 
 # Functie om Rexel data te verwerken en productinformatie op te halen
@@ -227,18 +215,19 @@ def process_rexel_data(data):
     # part_number = data['part_number']
 
     data = get_product("", "", product_number)
-    return data
-    # manufacturers = fetch_all_manufacturers()
-    """
+    
+    
+    manufacturers = get_all_manufacturers()
+
     if manufacturers:
         # Zoek een fabrikant op basis van naam
-        search_name = "Voorbeeld Naam"  # Vervang door de naam waar je naar wilt zoeken
-        manufacturer_id = find_manufacturer_id(manufacturers, search_name)
+        manufacturer_id = find_manufacturer_id(manufacturers, data["brand"])
 
         if manufacturer_id:
-            return f"Fabrikant '{search_name}' gevonden met ID: {manufacturer_id}"
+            return f"Fabrikant '{data["brand"]}' gevonden met ID: {manufacturer_id}"
         else:
-            return f"Fabrikant '{search_name}' niet gevonden."
+            return f"Fabrikant '{data["brand"]}' niet gevonden."
     else:
         return "Geen fabrikanten gevonden."
-    """
+
+    return json.dumps(data, indent=4, ensure_ascii=False)
