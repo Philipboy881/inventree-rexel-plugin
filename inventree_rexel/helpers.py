@@ -7,7 +7,7 @@ from company.models import Company
 BASE_URL = "https://philipboy88.com/api/"
 
 
-def get_all_manufacturers(self):
+def get_all_manufacturers():
     # Query alle fabrikanten in de database
     manufacturers = Company.objects.filter(is_manufacturer=True)
 
