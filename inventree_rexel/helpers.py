@@ -7,28 +7,18 @@ from company.models import Company
 BASE_URL = "https://philipboy88.com/api/"
 
 
-def get_all_manufacturers():
-    # Query alle fabrikanten in de database
-    manufacturers = Company.objects.filter(is_manufacturer=True)
-
-    # Converteer naar een lijst van dictionaries
-    manufacturer_data = [
-        {"id": manufacturer.id, "name": manufacturer.name}
-        for manufacturer in manufacturers
-    ]
-    return manufacturer_data
-
-
 # Functie om een fabrikant-ID op te zoeken op basis van naam
-def find_manufacturer_id(manufacturers, name):
-    # Zet de naam om naar kleine letters voor hoofdletterongevoelig zoeken
-    name_lower = name.lower()
+def find_or_create_manufacturer(name):
+    # Zet de naam om naar kleine letters voor hoofdletterongevoelige zoekopdracht
+    manufacturer_name_lower = name.lower()
 
-    for manufacturer in manufacturers:
-        if manufacturer["name"].lower() == name_lower:
-            return manufacturer["pk"]  # Primaire sleutel van de fabrikant
+    # Zoek naar de fabrikant op basis van de naam (hoofdletterongevoelig)
+    manufacturer, created = Company.objects.get_or_create(
+        name__iexact=manufacturer_name_lower,  # case-insensitive match voor de naam
+        defaults={"is_manufacturer": True}  # Voeg standaardwaarden toe als de fabrikant nieuw is
+    )
 
-    return None  # Geen match gevonden
+    return manufacturer.id  # Retourneer de id van de fabrikant
 
 
 # Login function to authenticate the user
@@ -216,18 +206,9 @@ def process_rexel_data(data):
 
     data = get_product("", "", product_number)
     
-    manufacturers = get_all_manufacturers()
+    # Zoek een fabrikant op basis van naam
+    manufacturer = data["brand"]
+    manufacturer_id = find_or_create_manufacturer(manufacturer)
 
-    if manufacturers:
-        # Zoek een fabrikant op basis van naam
-        manufacturer = data["brand"]
-        manufacturer_id = find_manufacturer_id(manufacturers, manufacturer)
-
-        if manufacturer_id:
-            return f"Fabrikant '{manufacturer}' gevonden met ID: {manufacturer_id}"
-        else:
-            return f"Fabrikant '{manufacturer}' niet gevonden."
-    else:
-        return "Geen fabrikanten gevonden."
-
+    return manufacturer_id
     return json.dumps(data, indent=4, ensure_ascii=False)
