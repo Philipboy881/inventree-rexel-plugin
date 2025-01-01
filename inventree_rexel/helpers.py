@@ -221,12 +221,13 @@ def process_rexel_data(data):
 
     if manufacturers:
         # Zoek een fabrikant op basis van naam
-        manufacturer_id = find_manufacturer_id(manufacturers, data["brand"])
+        manufacturer = data["brand"]
+        manufacturer_id = find_manufacturer_id(manufacturers, manufacturer)
 
         if manufacturer_id:
-            return f"Fabrikant '{data["brand"]}' gevonden met ID: {manufacturer_id}"
+            return f"Fabrikant '{manufacturer}' gevonden met ID: {manufacturer_id}"
         else:
-            return f"Fabrikant '{data["brand"]}' niet gevonden."
+            return f"Fabrikant '{manufacturer}' niet gevonden."
     else:
         return "Geen fabrikanten gevonden."
 
