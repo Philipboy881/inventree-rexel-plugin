@@ -4,8 +4,7 @@ import json
 import sys
 from company.models import Company
 from part.models import Part
-
-BASE_URL = "https://philipboy88.com/api/"
+from company.models import ManufacturerPart, SupplierPart
 
 
 # Functie om een fabrikant-ID op te zoeken op basis van naam
@@ -22,6 +21,49 @@ def find_or_create_company(name):
     return manufacturer.id  # Retourneer de id van de fabrikant
 
 
+def get_or_create_manufacturer_part(ipn, mpn, manufacturer_id):
+    """
+    Zoek de ManufacturerPart op basis van mpn (Manufacturer Part Number) en fabrikant ID.
+    Als het niet bestaat, maak het dan aan.
+    """
+    # Zoek of maak het Part object op basis van 'ipn'
+    try:
+        part_instance = Part.objects.get(IPN=ipn)  # Pas 'id' aan op basis van je model
+    except Part.DoesNotExist:
+        raise ValueError(f"Part with ID '{ipn}' does not exist")
+    
+    manufacturer_part, created = ManufacturerPart.objects.get_or_create(
+        part=part_instance,
+        manufacturer_id=manufacturer_id,
+        MPN=mpn
+    )
+    return manufacturer_part
+
+def create_supplier_part(ipn, supplier_id, manufacturer_part,sku):
+    """
+    Maak een SupplierPart aan en koppel deze aan de juiste ManufacturerPart.
+    """
+    
+    try:
+        supplier_instance = Company.objects.get(id=supplier_id)
+    except Company.DoesNotExist:
+        raise ValueError(f"Supplier with ID '{supplier_id}' does not exist")
+
+
+    try:
+        part_instance = Part.objects.get(IPN=ipn)  # Pas 'id' aan op basis van je model
+    except Part.DoesNotExist:
+        raise ValueError(f"Part with ID '{ipn}' does not exist")
+    
+    supplier_part, created = SupplierPart.objects.get_or_create(
+        part=part_instance,
+        SKU=sku,
+        supplier=supplier_instance,
+        manufacturer_part=manufacturer_part
+    )
+    return supplier_part
+
+
 # functie voor onderdelen aan te maken in het systeem
 def create_part(data, manufacturer_id, supplier_id, internal_part_number):
     """
@@ -34,30 +76,27 @@ def create_part(data, manufacturer_id, supplier_id, internal_part_number):
     name = data.get("name", None)
     description = data.get("description", "")
     brand = data.get("brand", None)
-    # ean = data.get("ean", None)  # EAN gebruiken als scan code
-    unit = data.get("unit", None)
+    unit = data.get("unit", None).lower()
     image_url = data.get("image url", None)
-    # url = data.get("url", None)
-    # general_info = data.get("general_information", {})
     manufacturerpartnr = data.get("product number", None)
     supplierpartnr = data.get("code", None)
 
     # Maak het onderdeel aan in je systeem (bijv. door een database model te gebruiken)
     part = Part.objects.create(
-        internal_part_number=internal_part_number,  # Internal Part Number (IPN)
+        IPN=internal_part_number,  # Internal Part Number (IPN)
         name=name,
         description=description,
-        brand=brand,
-        manufacturer=manufacturer_id,  # Fabrikant ID
-        sku=supplierpartnr,
-        supplier=supplier_id,  # Leverancier ID
-        mpn=manufacturerpartnr,
-        default_supplier=supplier_id,
-        # ean=ean,  # EAN als scan code
         units=unit,
-        remote_image=image_url,
-        # url=url,
+        remote_image=image_url
     )
+
+    manufacturer_part = get_or_create_manufacturer_part(internal_part_number, manufacturerpartnr, manufacturer_id)
+
+    # Maak het SupplierPart aan (gebruik het juiste manufacturer_part)
+    supplier_part_instance = create_supplier_part(internal_part_number, supplier_id, manufacturer_part, supplierpartnr)
+
+    part.default_supplier = supplier_part_instance
+    part.save()  # Zorg ervoor dat de wijziging wordt opgeslagen in de database
 
     return part.id  # Retourneer de ID van het aangemaakte part
 
@@ -83,7 +122,7 @@ def get_price(session, url):
     if response.status_code != 200:
         print(f"Error retrieving price: {response.status_code}")
         sys.exit()
-    
+
     data = response.json()
     return data[0]['price']
 
@@ -183,7 +222,7 @@ def get_data_from_html(html):
     # Extract the product description
     product_description = soup.find("div", class_="long-product-description")
     cleaned_product_description = product_description.get_text(strip=True) if product_description else "Description not available"
-    
+
     # Use the extract_table_data function to extract general information from the tables
     table1 = soup.find_all("div", class_="col-6 pr-5 px-lg-3")
     table2 = soup.find_all("div", class_="col-6 pl-5 px-lg-4")
@@ -249,7 +288,7 @@ def process_rexel_data(data):
     internal_part_number = data['part_number']
 
     data = get_product("", "", product_number)
-    
+
     # Zoek een fabrikant op basis van naam en anders creeren
     manufacturer = data["brand"]
     manufacturer_id = find_or_create_company(manufacturer)
@@ -258,3 +297,4 @@ def process_rexel_data(data):
 
     return part_id
     return json.dumps(data, indent=4, ensure_ascii=False)
+
