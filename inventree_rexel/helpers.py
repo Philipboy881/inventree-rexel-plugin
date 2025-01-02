@@ -39,7 +39,8 @@ def get_or_create_manufacturer_part(ipn, mpn, manufacturer_id):
     )
     return manufacturer_part
 
-def create_supplier_part(ipn, supplier_id, manufacturer_part,sku):
+
+def create_supplier_part(ipn, supplier_id, manufacturer_part, sku):
     """
     Maak een SupplierPart aan en koppel deze aan de juiste ManufacturerPart.
     """
@@ -48,7 +49,6 @@ def create_supplier_part(ipn, supplier_id, manufacturer_part,sku):
         supplier_instance = Company.objects.get(id=supplier_id)
     except Company.DoesNotExist:
         raise ValueError(f"Supplier with ID '{supplier_id}' does not exist")
-
 
     try:
         part_instance = Part.objects.get(IPN=ipn)  # Pas 'id' aan op basis van je model
@@ -75,7 +75,6 @@ def create_part(data, manufacturer_id, supplier_id, internal_part_number):
     # Verkrijg de productinformatie uit de data
     name = data.get("name", None)
     description = data.get("description", "")
-    brand = data.get("brand", None)
     unit = data.get("unit", None).lower()
     image_url = data.get("image url", None)
     manufacturerpartnr = data.get("product number", None)
@@ -297,4 +296,3 @@ def process_rexel_data(data):
 
     return part_id
     return json.dumps(data, indent=4, ensure_ascii=False)
-
