@@ -87,7 +87,7 @@ def create_part(data, manufacturer_id, supplier_id, internal_part_number):
         name=name,
         description=description,
         units=unit,
-        remote_image=image_url
+        image=image_url
     )
 
     manufacturer_part = get_or_create_manufacturer_part(internal_part_number, manufacturerpartnr, manufacturer_id)
