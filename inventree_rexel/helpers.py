@@ -112,6 +112,7 @@ class RexelHelper:
     def create_part(self, data, manufacturer_id, supplier_id, internal_part_number):
         name = data.get("name", None)
         description = data.get("description", "")
+        notes = ""
         if len(description) > 250:
             notes = description
             description = description[:250]
