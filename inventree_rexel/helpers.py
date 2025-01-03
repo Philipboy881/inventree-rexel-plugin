@@ -5,7 +5,7 @@ from company.models import ManufacturerPart, SupplierPart
 from InvenTree.helpers_model import download_image_from_url
 from django.core.files.base import ContentFile
 from common.models import InvenTreeSetting
-from django.db import OperationalError
+from django.db import OperationalError, transaction
 import io
 from .datahandler import DataHandler
 
@@ -36,16 +36,20 @@ class RexelHelper:
         """
         Voeg parameters toe aan een Part of werk bestaande parameters bij.
         """
-        for name, value in parameters.items():
-            template = self.get_model_instance(PartParameterTemplate, name, {}, f"for {part.name}")
-            parameter, created = PartParameter.objects.get_or_create(
-                part=part,
-                template=template,
-                defaults={'data': value}
-            )
-            if not created:
-                parameter.data = value
-                parameter.save()
+        with transaction.atomic():
+            for name, value in parameters.items():
+                template = self.get_model_instance(PartParameterTemplate, name, {}, f"for {part.name}")
+                
+                def create_or_update_parameter():
+                    parameter, created = PartParameter.objects.get_or_create(
+                        part=part,
+                        template=template,
+                        defaults={'data': value}
+                    )
+                    if not created:
+                        parameter.data = value
+                        parameter.save()
+                self.retry_database_operation(create_or_update_parameter)
 
     def find_or_create_company(self, name):
         """
