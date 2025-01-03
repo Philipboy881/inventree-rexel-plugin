@@ -18,6 +18,6 @@ class RexelView(APIView):
         serializer.is_valid(raise_exception=True)
 
         rexelhelper = RexelHelper()
-        processed_data = rexelhelper.plugin.process_rexel_data(serializer.validated_data)
+        processed_data = rexelhelper.process_rexel_data(serializer.validated_data)
 
         return Response(processed_data, status=status.HTTP_200_OK)
