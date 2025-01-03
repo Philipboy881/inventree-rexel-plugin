@@ -8,6 +8,7 @@ from part.models import Part, PartParameter, PartParameterTemplate
 from company.models import ManufacturerPart, SupplierPart
 from InvenTree.helpers_model import download_image_from_url
 from django.core.files.base import ContentFile
+from common.models import InvenTreeSetting
 import io
 
 class RexelHelper:
