@@ -5,130 +5,113 @@ from company.models import ManufacturerPart, SupplierPart
 from InvenTree.helpers_model import download_image_from_url
 from django.core.files.base import ContentFile
 from common.models import InvenTreeSetting
+from django.db import OperationalError
 import io
-
 from .datahandler import DataHandler
 
 
 class RexelHelper:
+    @staticmethod
+    def retry_database_operation(func, retries=5, delay=0.5):
+        """
+        Probeer een database-operatie opnieuw uit te voeren als er een OperationalError optreedt.
+        """
+        for attempt in range(retries):
+            try:
+                return func()
+            except OperationalError as e:
+                if "database is locked" in str(e):
+                    time.sleep(delay)
+                else:
+                    raise
+        raise OperationalError(f"Exceeded maximum retries ({retries}) for database operation")
 
     def get_model_instance(self, model_class, identifier, defaults, context):
         """
-        Haal een modelinstantie op op basis van een identifier (zoals naam of ID) en creëer deze als deze niet bestaat.
-        :param model_class: Het model waaraan we willen refereren
-        :param identifier: De identifier waarmee we zoeken (bijvoorbeeld een naam)
-        :param defaults: Standaardwaarden die we moeten toevoegen als we de instantie creëren
-        :param context: Een contextuele string voor foutmeldingen
-        :return: De modelinstantie
+        Haal een modelinstantie op of maak deze aan als deze niet bestaat.
         """
-        try:
-            # Zoek het object op, bijvoorbeeld op basis van naam of andere identificatoren
-            instance = model_class.objects.get(name=identifier)
-        except model_class.DoesNotExist:
-            # Als het niet bestaat, maak het dan aan met de standaardwaarden
-            instance = model_class.objects.create(name=identifier, **defaults)
-        return instance
+        return model_class.objects.get_or_create(name=identifier, defaults=defaults)[0]
 
     def add_or_update_parameters(self, part, parameters):
         """
-        Voeg parameters toe aan een part of werk bestaande parameters bij.
-        
-        :param part: Het part waaraan parameters worden toegevoegd.
-        :param parameters: Een dictionary met parameternaam als sleutel en waarde als waarde.
+        Voeg parameters toe aan een Part of werk bestaande parameters bij.
         """
         for name, value in parameters.items():
-            # Verkrijg of maak een PartParameterTemplate aan met de gegeven naam
             template = self.get_model_instance(PartParameterTemplate, name, {}, f"for {part.name}")
-            
-            try:
-                # Probeer de PartParameter te verkrijgen of aan te maken
-                parameter, created = PartParameter.objects.get_or_create(
-                    part=part,
-                    template=template,
-                    defaults={'data': value}
-                )
-                
-                # Als de parameter al bestaat, werk dan de waarde bij
-                if not created:
-                    parameter.data = value
-                    parameter.save()
-
-            except Exception:
-                time.sleep(0.1)  # Wacht een seconde en probeer het opnieuw
-                continue
-            
-            time.sleep(0.1)  # Wacht een seconde en probeer het opnieuw
+            parameter, created = PartParameter.objects.get_or_create(
+                part=part,
+                template=template,
+                defaults={'data': value}
+            )
+            if not created:
+                parameter.data = value
+                parameter.save()
 
     def find_or_create_company(self, name):
-        manufacturer_name_lower = name.lower()
-
-        if name == "rexel":
-            manufacturer, created = Company.objects.get_or_create(
-                name__iexact=manufacturer_name_lower,
-                defaults={"name": manufacturer_name_lower, "is_manufacturer": True, "is_supplier": True}
-            )
-        else:
-            manufacturer, created = Company.objects.get_or_create(
-                name__iexact=manufacturer_name_lower,
-                defaults={"name": manufacturer_name_lower, "is_manufacturer": True, "is_supplier": False}
-            )
-
-        return manufacturer.id
+        """
+        Zoek of maak een bedrijf aan op basis van de naam.
+        """
+        name_lower = name.lower()
+        is_supplier = name == "rexel"
+        return Company.objects.get_or_create(
+            name__iexact=name_lower,
+            defaults={"name": name_lower, "is_manufacturer": True, "is_supplier": is_supplier}
+        )[0].id
 
     def get_or_create_manufacturer_part(self, ipn, mpn, manufacturer_id):
-        try:
-            part_instance = Part.objects.get(IPN=ipn)
-        except Part.DoesNotExist:
-            raise ValueError(f"Part with ID '{ipn}' does not exist")
-        
-        manufacturer_part, created = ManufacturerPart.objects.get_or_create(
+        """
+        Zoek of maak een ManufacturerPart aan.
+        """
+        part_instance = Part.objects.filter(IPN=ipn).first()
+        if not part_instance:
+            raise ValueError(f"Part with IPN '{ipn}' does not exist")
+        return ManufacturerPart.objects.get_or_create(
             part=part_instance,
             manufacturer_id=manufacturer_id,
             MPN=mpn
-        )
-        return manufacturer_part
+        )[0]
 
     def create_supplier_part(self, ipn, supplier_id, manufacturer_part, sku):
-        try:
-            supplier_instance = Company.objects.get(id=supplier_id)
-        except Company.DoesNotExist:
+        """
+        Zoek of maak een SupplierPart aan.
+        """
+        supplier_instance = Company.objects.filter(id=supplier_id).first()
+        if not supplier_instance:
             raise ValueError(f"Supplier with ID '{supplier_id}' does not exist")
 
-        try:
-            part_instance = Part.objects.get(IPN=ipn)
-        except Part.DoesNotExist:
-            raise ValueError(f"Part with ID '{ipn}' does not exist")
-        
-        supplier_part, created = SupplierPart.objects.get_or_create(
+        part_instance = Part.objects.filter(IPN=ipn).first()
+        if not part_instance:
+            raise ValueError(f"Part with IPN '{ipn}' does not exist")
+
+        return SupplierPart.objects.get_or_create(
             part=part_instance,
             SKU=sku,
             supplier=supplier_instance,
             manufacturer_part=manufacturer_part
-        )
-        return supplier_part
+        )[0]
 
     def create_part(self, data, manufacturer_id, supplier_id, internal_part_number):
-        name = data.get("name", None)
-        description = data.get("description", "")
-        notes = ""
-        if len(description) > 250:
-            notes = description
-            description = description[:250]
-        unit = data.get("unit", None).lower()
-        image_url = data.get("image url", None)
-        manufacturerpartnr = data.get("product number", None)
-        supplierpartnr = data.get("code", None)
+        """
+        Maak een nieuw Part-object en koppel relevante gegevens zoals manufacturer en supplier.
+        """
+        name = data.get("name")
+        description = data.get("description", "")[:250]
+        notes = data.get("description", "")[250:]
+        unit = data.get("unit", "").lower()
+        image_url = data.get("image url")
+        manufacturer_part_number = data.get("product number")
+        supplier_part_number = data.get("code")
 
-        # Download de afbeelding als de URL is opgegeven
+        if not name:
+            raise ValueError("Part name is required")
+
         remote_img = None
-        if image_url:
-            if not InvenTreeSetting.get_setting('INVENTREE_DOWNLOAD_FROM_URL'):
-                raise ValueError("Downloading images from remote URL is not enabled")
+        if image_url and InvenTreeSetting.get_setting('INVENTREE_DOWNLOAD_FROM_URL'):
             try:
                 remote_img = download_image_from_url(image_url)
             except Exception as e:
-                print(f"Fout bij het downloaden van de afbeelding: {e}")
-                
+                print(f"Error downloading image: {e}")
+
         part = Part.objects.create(
             IPN=internal_part_number,
             name=name,
@@ -137,42 +120,39 @@ class RexelHelper:
             units=unit
         )
 
-        # Koppel de afbeelding aan het Part-object
         if remote_img:
-            fmt = remote_img.format or 'PNG'
             buffer = io.BytesIO()
+            fmt = remote_img.format or "PNG"
             remote_img.save(buffer, format=fmt)
-
             filename = f"part_{part.pk}_image.{fmt.lower()}"
-            part.image.save(
-                filename,
-                ContentFile(buffer.getvalue()),
-            )
+            part.image.save(filename, ContentFile(buffer.getvalue()))
 
-        manufacturer_part = self.get_or_create_manufacturer_part(internal_part_number, manufacturerpartnr, manufacturer_id)
+        manufacturer_part = self.get_or_create_manufacturer_part(internal_part_number, manufacturer_part_number, manufacturer_id)
+        supplier_part = self.create_supplier_part(internal_part_number, supplier_id, manufacturer_part, supplier_part_number)
 
-        supplier_part_instance = self.create_supplier_part(internal_part_number, supplier_id, manufacturer_part, supplierpartnr)
-
-        part.default_supplier = supplier_part_instance
+        part.default_supplier = supplier_part
         part.save()
 
-        general_information = data.get("general_information", {})
-        self.add_or_update_parameters(part, general_information)
+        general_info = data.get("general_information", {})
+        self.add_or_update_parameters(part, general_info)
 
         return part.id
 
     def process_rexel_data(self, data):
+        """
+        Verwerk Rexel-productgegevens en maak de benodigde database-objecten aan.
+        """
         rexel_id = self.find_or_create_company("rexel")
+        product_number = data.get("product_number")
+        internal_part_number = data.get("part_number")
 
-        product_number = data['product_number']
-        internal_part_number = data['part_number']
+        if not product_number or not internal_part_number:
+            raise ValueError("Product number and part number are required")
 
         datahandler = DataHandler()
-        data = datahandler.requestdata(product_number, "", "")
+        rexel_data = datahandler.requestdata(product_number, "", "")
 
-        manufacturer = data["brand"]
-        manufacturer_id = self.find_or_create_company(manufacturer)
+        manufacturer_name = rexel_data.get("brand", "Unknown")
+        manufacturer_id = self.find_or_create_company(manufacturer_name)
 
-        part_id = self.create_part(data, manufacturer_id, rexel_id, internal_part_number)
-
-        return part_id
+        return self.create_part(rexel_data, manufacturer_id, rexel_id, internal_part_number)
