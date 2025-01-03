@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
 import requests
-import json
 import sys
 import time
 from company.models import Company
@@ -11,8 +10,8 @@ from django.core.files.base import ContentFile
 from common.models import InvenTreeSetting
 import io
 
-class RexelHelper:
 
+class RexelHelper:
 
     def get_model_instance(self, model_class, identifier, defaults, context):
         """
@@ -55,7 +54,7 @@ class RexelHelper:
                     parameter.data = value
                     parameter.save()
 
-            except Exception as e:
+            except Exception:
                 time.sleep(0.1)  # Wacht een seconde en probeer het opnieuw
                 continue
             
@@ -64,7 +63,7 @@ class RexelHelper:
     def find_or_create_company(self, name):
         manufacturer_name_lower = name.lower()
 
-        if(name == "rexel"):
+        if name == "rexel":
             manufacturer, created = Company.objects.get_or_create(
                 name__iexact=manufacturer_name_lower,
                 defaults={"name": manufacturer_name_lower, "is_manufacturer": True, "is_supplier": True}
@@ -132,14 +131,14 @@ class RexelHelper:
                 print(f"Fout bij het downloaden van de afbeelding: {e}")
                 
         part = Part.objects.create(
-            IPN=internal_part_number,  
+            IPN=internal_part_number,
             name=name,
             description=description,
             notes=notes,
             units=unit
         )
 
-          # Koppel de afbeelding aan het Part-object
+        # Koppel de afbeelding aan het Part-object
         if remote_img:
             fmt = remote_img.format or 'PNG'
             buffer = io.BytesIO()
@@ -194,8 +193,8 @@ class RexelHelper:
             product_image_url = product["images"][3].get('url', 'Image not available')
             product_brandname = product.get('brandName', 'brand not available')
             product_ean = product.get('ean', 'ean not available')
-            product_numbercontentunits = product.get('numberContentUnits', 'numbercontentunits not available')  
-            product_manufactureraid = product.get('manufacturerAID', 'manufactureraid not available')  
+            product_numbercontentunits = product.get('numberContentUnits', 'numbercontentunits not available')
+            product_manufactureraid = product.get('manufacturerAID', 'manufactureraid not available')
             product_pricingqty = product.get('pricingQty', 'pricingqty  not available')
             
             returndata = {
@@ -215,7 +214,7 @@ class RexelHelper:
             sys.exit()
 
     # Function to get the product data from the provided URL
-    def get_product_data(self,session, url):
+    def get_product_data(self, session, url):
         response = session.get(url)
 
         if response.status_code != 200:
@@ -284,7 +283,7 @@ class RexelHelper:
         return data
 
     # Main function to get product data and price
-    def get_product(self,username, password, product):
+    def get_product(self, username, password, product):
         base_url = "https://www.rexel.nl/nln"
         login_url = "https://www.rexel.nl/nln/j_spring_security_check"
         price_url = "https://www.rexel.nl/nln/erp/getPrice.json?products="
