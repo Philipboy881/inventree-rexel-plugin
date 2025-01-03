@@ -26,7 +26,7 @@ function ImportPanel({ context }: { context: any }) {
         queryKey: ['import-data', product_number, part_number],
         queryFn: async () => {
             const controller = new AbortController(); // Voor timeout
-            const timeoutId = setTimeout(() => controller.abort(), 5000); // Timeout na 5 seconden
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // Timeout na 5 seconden
 
             try {
                 const response = await context.api?.post(IVENTREE_REXEL_URL, {
