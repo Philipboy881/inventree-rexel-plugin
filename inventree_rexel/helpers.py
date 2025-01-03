@@ -6,9 +6,11 @@ import time
 from company.models import Company
 from part.models import Part, PartParameter, PartParameterTemplate
 from company.models import ManufacturerPart, SupplierPart
+from InvenTree.helpers_model import download_image_from_url
+from django.core.files.base import ContentFile
+import io
 
-
-class RexelHelper:
+class RexelHelper():
 
 
     def get_model_instance(self, model_class, identifier, defaults, context):
@@ -117,14 +119,35 @@ class RexelHelper:
         manufacturerpartnr = data.get("product number", None)
         supplierpartnr = data.get("code", None)
 
+        # Download de afbeelding als de URL is opgegeven
+        remote_img = None
+        if image_url:
+            if not InvenTreeSetting.get_setting('INVENTREE_DOWNLOAD_FROM_URL'):
+                raise ValueError("Downloading images from remote URL is not enabled")
+            try:
+                remote_img = download_image_from_url(image_url)
+            except Exception as e:
+                print(f"Fout bij het downloaden van de afbeelding: {e}")
+                
         part = Part.objects.create(
             IPN=internal_part_number,  
             name=name,
             description=description,
             notes=notes,
-            units=unit,
-            image=image_url
+            units=unit
         )
+
+          # Koppel de afbeelding aan het Part-object
+        if remote_img:
+            fmt = remote_img.format or 'PNG'
+            buffer = io.BytesIO()
+            remote_img.save(buffer, format=fmt)
+
+            filename = f"part_{part.pk}_image.{fmt.lower()}"
+            part.image.save(
+                filename,
+                ContentFile(buffer.getvalue()),
+            )
 
         manufacturer_part = self.get_or_create_manufacturer_part(internal_part_number, manufacturerpartnr, manufacturer_id)
 
