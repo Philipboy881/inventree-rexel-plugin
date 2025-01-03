@@ -54,7 +54,7 @@ function ImportPanel({ context }: { context: any }) {
         } catch (error: any) {
             // Controleer of de fout door een timeout komt
             if (error.name === 'AbortError') {
-                alert('The request timed out. Please try again.' + pluginSettings);
+                alert('The request timed out. Please try again. ' + pluginSettings);
             } else {
                 alert('An error has occurred while importing data.');
             }
@@ -65,11 +65,13 @@ function ImportPanel({ context }: { context: any }) {
 
     return (
         <Paper withBorder p="sm" m="sm" pos="relative">
+            {/* Error handling */}
             {isError && (
                 <Alert color="red" title="Error">
                     An error has occurred while getting your data.
                 </Alert>
             )}
+
             <Group gap="xs" grow>
                 <TextInput
                     label="Product EAN, SKU, Type of description"
@@ -91,18 +93,29 @@ function ImportPanel({ context }: { context: any }) {
                     Import
                 </Button>
             </Group>
+
             {data && (
                 <Paper mt="md" withBorder p="sm">
-                    {(isSubmitting || isLoading) && (
-                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                            <Loader size="xl" />
-                        </div>
-                    )}
                     <Text>Import Results:</Text>
                     <Code block>
                         {JSON.stringify(data ?? {}, null, 2)} {/* Formatteer de JSON met inspringingen */}
                     </Code>
                 </Paper>
+            )}
+
+            {/* Spinner onderaan de pagina */}
+            {(isSubmitting || isLoading) && (
+                <div style={{
+                    position: 'absolute', 
+                    bottom: '20px', 
+                    left: '50%', 
+                    transform: 'translateX(-50%)', 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    width: '100%',
+                }}>
+                    <Loader size="xl" />
+                </div>
             )}
         </Paper>
     );
