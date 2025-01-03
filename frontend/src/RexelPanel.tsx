@@ -54,7 +54,7 @@ function ImportPanel({ context }: { context: any }) {
         } catch (error: any) {
             // Controleer of de fout door een timeout komt
             if (error.name === 'AbortError') {
-                alert('The request timed out. Please try again.');
+                alert('The request timed out. Please try again.' + pluginSettings);
             } else {
                 alert('An error has occurred while importing data.');
             }
