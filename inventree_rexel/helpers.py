@@ -10,7 +10,7 @@ from InvenTree.helpers_model import download_image_from_url
 from django.core.files.base import ContentFile
 import io
 
-class RexelHelper():
+class RexelHelper:
 
 
     def get_model_instance(self, model_class, identifier, defaults, context):
