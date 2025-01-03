@@ -1,6 +1,3 @@
-from bs4 import BeautifulSoup
-import requests
-import sys
 import time
 from company.models import Company
 from part.models import Part, PartParameter, PartParameterTemplate
@@ -11,6 +8,7 @@ from common.models import InvenTreeSetting
 import io
 
 from .datahandler import DataHandler
+
 
 class RexelHelper:
 
