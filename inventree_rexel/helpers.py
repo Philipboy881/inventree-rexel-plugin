@@ -100,7 +100,7 @@ class RexelHelper:
         """
         name = data.get("name")
         description = data.get("description", "")[:250]
-        notes = data.get("description", "")[250:]
+        notes = data.get("description", "")
         unit = data.get("unit", "").lower()
         image_url = data.get("image url")
         manufacturer_part_number = data.get("product number")
