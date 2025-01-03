@@ -191,7 +191,7 @@ class RexelHelper:
             product_code = product.get('code', 'Code not available')
             product_name = product.get('name', 'Name not available')
             product_url = product.get('url', 'URL not available')
-            product_image_url = product["images"][0].get('url', 'Image not available')
+            product_image_url = product["images"][3].get('url', 'Image not available')
             product_brandname = product.get('brandName', 'brand not available')
             product_ean = product.get('ean', 'ean not available')
             product_numbercontentunits = product.get('numberContentUnits', 'numbercontentunits not available')  
