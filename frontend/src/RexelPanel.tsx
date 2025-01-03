@@ -17,22 +17,30 @@ function ImportPanel({ context }: { context: any }) {
     const IVENTREE_REXEL_URL = "plugin/inventree_rexel/rexel/";
 
     // Geef de queryClient door aan useQuery
-    const { data, isError, isLoading, refetch } = useQuery<{ 
-        product_number: string; 
-        part_number: string; 
-        status: string; 
-        message: string; 
+    const { data, isError, isLoading, refetch } = useQuery<{
+        product_number: string;
+        part_number: string;
+        status: string;
+        message: string;
     }>({
         queryKey: ['import-data', product_number, part_number],
         queryFn: async () => {
-            const response = await context.api?.post(IVENTREE_REXEL_URL, {
-                product_number,
-                part_number,
-            });
-            return response?.data;
+            const controller = new AbortController(); // Voor timeout
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // Timeout na 5 seconden
+
+            try {
+                const response = await context.api?.post(IVENTREE_REXEL_URL, {
+                    product_number,
+                    part_number,
+                    signal: controller.signal, // AbortController signal
+                });
+                return response?.data;
+            } finally {
+                clearTimeout(timeoutId); // Zorg ervoor dat de timeout wordt opgeruimd
+            }
         },
         enabled: false, // Alleen uitvoeren als refetch wordt aangeroepen
-    }, queryClient); // Het doorgeven van queryClient hier
+    }, queryClient);
 
     const handleImport = async () => {
         if (!product_number || !part_number) {
@@ -43,8 +51,13 @@ function ImportPanel({ context }: { context: any }) {
         try {
             setIsSubmitting(true);
             await refetch();
-        } catch (error) {
-            alert('An error has occurred while getting your data while importing. ' + pluginSettings);
+        } catch (error: any) {
+            // Controleer of de fout door een timeout komt
+            if (error.name === 'AbortError') {
+                alert('The request timed out. Please try again.');
+            } else {
+                alert('An error has occurred while importing data.');
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -52,12 +65,6 @@ function ImportPanel({ context }: { context: any }) {
 
     return (
         <Paper withBorder p="sm" m="sm" pos="relative">
-            {(isSubmitting || isLoading) && (
-                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                    <Loader size="xl" />
-                </div>
-            )}
-
             {isError && (
                 <Alert color="red" title="Error">
                     An error has occurred while getting your data.
@@ -86,7 +93,12 @@ function ImportPanel({ context }: { context: any }) {
             </Group>
             {data && (
                 <Paper mt="md" withBorder p="sm">
-                     <Text>Import Results:</Text>
+                    {(isSubmitting || isLoading) && (
+                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                            <Loader size="xl" />
+                        </div>
+                    )}
+                    <Text>Import Results:</Text>
                     <Code block>
                         {JSON.stringify(data ?? {}, null, 2)} {/* Formatteer de JSON met inspringingen */}
                     </Code>
