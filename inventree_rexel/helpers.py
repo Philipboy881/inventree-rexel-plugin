@@ -8,6 +8,7 @@ from common.models import InvenTreeSetting
 from django.db import OperationalError, transaction
 import io
 from .datahandler import DataHandler
+import threading
 
 
 class RexelHelper:
@@ -27,29 +28,38 @@ class RexelHelper:
         raise OperationalError(f"Exceeded maximum retries ({retries}) for database operation")
 
     def get_model_instance(self, model_class, identifier, defaults, context):
-        """
-        Haal een modelinstantie op of maak deze aan als deze niet bestaat.
-        """
-        return model_class.objects.get_or_create(name=identifier, defaults=defaults)[0]
-
+        # Probeer de instantie op te halen of te creëren
+        try:
+            # Gebruik get_or_create voor eenvoudiger ophalen of creëren
+            instance, created = model_class.objects.get_or_create(name=identifier, defaults=defaults)
+            return instance
+        except Exception as e:
+            # Log de fout, zodat je kunt zien waarom dit misgaat
+            print(f"Fout bij ophalen/creëren van model: {e}")
+            raise e
+    
     def add_or_update_parameters(self, part, parameters):
         """
         Voeg parameters toe aan een Part of werk bestaande parameters bij.
         """
+        # Verzamel alle parameters in een lijst
+        to_create_or_update = []
         with transaction.atomic():
             for name, value in parameters.items():
                 template = self.get_model_instance(PartParameterTemplate, name, {}, f"for {part.name}")
-                
-                def create_or_update_parameter():
-                    parameter, created = PartParameter.objects.get_or_create(
-                        part=part,
-                        template=template,
-                        defaults={'data': value}
-                    )
-                    if not created:
-                        parameter.data = value
-                        parameter.save()
-                self.retry_database_operation(create_or_update_parameter)
+                to_create_or_update.append((part, template, value))
+
+        # Nu pas daadwerkelijk in de database schrijven in één transactie
+        with transaction.atomic():
+            for part, template, value in to_create_or_update:
+                parameter, created = PartParameter.objects.get_or_create(
+                    part=part,
+                    template=template,
+                    defaults={'data': value}
+                )
+                if not created:
+                    parameter.data = value
+                    parameter.save()
 
     def find_or_create_company(self, name):
         """
@@ -142,21 +152,40 @@ class RexelHelper:
 
         return part.id
 
+    def _process_data_in_background(self, data, rexel_data):
+        """
+        Verwerk de Rexel data in de achtergrond (achtergrond thread).
+        Dit is de werkelijke verwerking die in een aparte thread draait.
+        """
+        try:
+            # Je verwerking van de Rexel data hier
+            print("Processing Rexel data in the background...")
+            rexel_id = self.find_or_create_company("rexel")
+            product_number = data.get("product_number")
+            internal_part_number = data.get("part_number")
+
+            if not product_number or not internal_part_number:
+                raise ValueError("Product number and part number are required")
+            
+            manufacturer_name = rexel_data.get("brand", "Unknown")
+            manufacturer_id = self.find_or_create_company(manufacturer_name)
+
+            self.create_part(rexel_data, manufacturer_id, rexel_id, internal_part_number)
+
+
+            print("Data verwerking voltooid.")
+        except Exception as e:
+            print(f"Fout bij het verwerken van de Rexel data: {e}")
+
     def process_rexel_data(self, data):
         """
         Verwerk Rexel-productgegevens en maak de benodigde database-objecten aan.
         """
-        rexel_id = self.find_or_create_company("rexel")
+ 
         product_number = data.get("product_number")
-        internal_part_number = data.get("part_number")
-
-        if not product_number or not internal_part_number:
-            raise ValueError("Product number and part number are required")
 
         datahandler = DataHandler()
         rexel_data = datahandler.requestdata(product_number, "", "")
 
-        manufacturer_name = rexel_data.get("brand", "Unknown")
-        manufacturer_id = self.find_or_create_company(manufacturer_name)
-
-        return self.create_part(rexel_data, manufacturer_id, rexel_id, internal_part_number)
+        threading.Thread(target=self._process_data_in_background, args=(data, rexel_data,)).start()
+        return rexel_data.get("name") + " word toegevoegd"
