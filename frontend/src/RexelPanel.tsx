@@ -124,13 +124,18 @@ function ImportPanel({ context }: { context: any }) {
 
 // Render de ImportPanel component zonder QueryClientProvider
 export function renderPanel(target: HTMLElement, context: any) {
+    // Lees de kleurmodus uit localStorage
+    const storedScheme = localStorage.getItem('schime');
+    const colorScheme = storedScheme === 'dark' ? 'dark' : 'light'; // Standaard naar 'light'
+
     createRoot(target).render(
         <MantineProvider
             theme={{
-                colorScheme: context.colorScheme, // Gebruik de kleurmodus van de context
+                colorScheme: colorScheme, // Gebruik de kleurmodus uit localStorage
             }}
         >
             <ImportPanel context={context} />
         </MantineProvider>
     );
 }
+
