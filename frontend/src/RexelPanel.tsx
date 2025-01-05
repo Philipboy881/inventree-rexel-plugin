@@ -16,7 +16,6 @@ function ImportPanel({ context }: { context: any }) {
 
     const IVENTREE_REXEL_URL = "plugin/inventree_rexel/rexel/";
 
-    // Geef de queryClient door aan useQuery
     const { data, isError, isLoading, refetch } = useQuery<{
         product_number: string;
         part_number: string;
@@ -26,21 +25,21 @@ function ImportPanel({ context }: { context: any }) {
         {
             queryKey: ['import-data', product_number, part_number],
             queryFn: async () => {
-                const controller = new AbortController(); // Voor timeout
-                const timeoutId = setTimeout(() => controller.abort(), 10000); // Timeout na 10 seconden
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
 
                 try {
                     const response = await context.api?.post(IVENTREE_REXEL_URL, {
                         product_number,
                         part_number,
-                        signal: controller.signal, // AbortController signal
+                        signal: controller.signal,
                     });
                     return response?.data;
                 } finally {
-                    clearTimeout(timeoutId); // Zorg ervoor dat de timeout wordt opgeruimd
+                    clearTimeout(timeoutId);
                 }
             },
-            enabled: false, // Alleen uitvoeren als refetch wordt aangeroepen
+            enabled: false,
         },
         queryClient
     );
@@ -128,11 +127,7 @@ export function renderPanel(target: HTMLElement, context: any) {
     const isDarkMode = context?.theme?.dark ?? false;
 
     createRoot(target).render(
-        <MantineProvider
-            theme={{
-                colorScheme: isDarkMode ? 'dark' : 'light', // Stel de juiste modus in
-            }}
-        >
+        <MantineProvider colorScheme={isDarkMode ? 'dark' : 'light'}>
             <ImportPanel context={context} />
         </MantineProvider>
     );
