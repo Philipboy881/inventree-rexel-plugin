@@ -13,6 +13,7 @@ function ImportPanel({ context }: { context: any }) {
     const [product_number, setproduct_number] = useState('');
     const [part_number, setpart_number] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const colorScheme = localStorage.getItem('colorScheme') || 'light'; // Default to 'light' if not set
 
     const IVENTREE_REXEL_URL = "plugin/inventree_rexel/rexel/";
 
@@ -124,12 +125,11 @@ function ImportPanel({ context }: { context: any }) {
 
 // Render de ImportPanel component zonder QueryClientProvider
 export function renderPanel(target: HTMLElement, context: any) {
-  // Verkrijg kleurmodus uit context die door de backend is doorgegeven
-  const colorScheme = context?.colorScheme ?? 'light';  // Fallback naar 'light' als geen kleurmodus is doorgegeven
+    
+    createRoot(target).render(
+      <MantineProvider theme={{ colorScheme }}>
+        <ImportPanel context={context} />
+      </MantineProvider>
+    );
 
-  createRoot(target).render(
-    <MantineProvider theme={{ colorScheme } as Partial<MantineTheme>}>
-      <ImportPanel context={context} />
-    </MantineProvider>
-  );
 }
