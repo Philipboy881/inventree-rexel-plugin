@@ -1,7 +1,7 @@
 import { Code, Button, Group, Paper, TextInput, MantineProvider, Alert, Text, Loader } from '@mantine/core';
 import { IconCloudDownload } from '@tabler/icons-react';
 import { useState, useMemo } from 'react';
-import { QueryClient, useQuery } from '@tanstack/react-query'; // Import alleen useQuery en QueryClient
+import { QueryClient, useQuery } from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
 
 // Maak een nieuwe QueryClient aan
@@ -55,7 +55,6 @@ function ImportPanel({ context }: { context: any }) {
             setIsSubmitting(true);
             await refetch();
         } catch (error: any) {
-            // Controleer of de fout door een timeout komt
             if (error.name === 'AbortError') {
                 alert('The request timed out. Please try again. ' + pluginSettings);
             } else {
@@ -68,7 +67,6 @@ function ImportPanel({ context }: { context: any }) {
 
     return (
         <Paper withBorder p="sm" m="sm" pos="relative">
-            {/* Error handling */}
             {isError && (
                 <Alert color="red" title="Error">
                     An error has occurred while getting your data.
@@ -101,12 +99,11 @@ function ImportPanel({ context }: { context: any }) {
                 <Paper mt="md" withBorder p="sm">
                     <Text>Import Results:</Text>
                     <Code block>
-                        {JSON.stringify(data ?? {}, null, 2)} {/* Formatteer de JSON met inspringingen */}
+                        {JSON.stringify(data ?? {}, null, 2)}
                     </Code>
                 </Paper>
             )}
 
-            {/* Spinner onderaan de pagina */}
             {(isSubmitting || isLoading) && (
                 <div
                     style={{
@@ -128,12 +125,11 @@ function ImportPanel({ context }: { context: any }) {
 
 // Render de ImportPanel component zonder QueryClientProvider
 export function renderPanel(target: HTMLElement, context: any) {
-    const isDarkMode = context?.theme?.dark ?? false; // Controleer of Inventree in dark mode is
+    const isDarkMode = context?.theme?.dark ?? false;
 
     createRoot(target).render(
         <MantineProvider
             theme={{
-                ...MantineProvider.defaultProps?.theme, // Zorg ervoor dat andere thema-instellingen behouden blijven
                 colorScheme: isDarkMode ? 'dark' : 'light', // Stel de juiste modus in
             }}
         >
