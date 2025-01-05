@@ -88,6 +88,7 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
                 ),
                 'context': {
                     'settings': self.plugin_settings,
+                    'colorScheme': color_scheme,  # Kleurmodus doorgeven aan de frontend
                 }
             }
         ]
