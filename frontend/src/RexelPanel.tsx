@@ -1,4 +1,4 @@
-import { Code, Button, Group, Paper, TextInput, MantineProvider, MantineThemeOverride, useMantineColorScheme, Alert, Text, Loader } from '@mantine/core';
+import { Code, Button, Group, Paper, TextInput, MantineProvider, ThemeProvider, Alert, Text, Loader } from '@mantine/core';
 import { IconCloudDownload } from '@tabler/icons-react';
 import { useState, useMemo } from 'react';
 import { QueryClient, useQuery } from '@tanstack/react-query';
@@ -124,12 +124,16 @@ function ImportPanel({ context }: { context: any }) {
 
 // Render de ImportPanel component zonder QueryClientProvider
 export function renderPanel(target: HTMLElement, context: any) {
-    // Lees de kleurmodus uit localStorage
-    const storedScheme = localStorage.getItem('scheme');
-    const colorScheme = storedScheme === 'dark' ? 'dark' : 'light'; // Standaard naar 'light'
+    const storedScheme = localStorage.getItem('schime');
+    const colorScheme = storedScheme === 'dark' ? 'dark' : 'light';
 
+    // Handmatige kleurmodus beheer
     createRoot(target).render(
-        <MantineProvider theme={{ colorScheme }}>
+        <MantineProvider
+            theme={{
+                colorScheme: colorScheme,  // Dynamisch thema
+            }}
+        >
             <ImportPanel context={context} />
         </MantineProvider>
     );
