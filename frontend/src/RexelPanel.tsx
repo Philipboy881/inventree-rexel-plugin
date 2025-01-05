@@ -1,6 +1,6 @@
 import { Code, Button, Group, Paper, TextInput, MantineProvider, Alert, Text, Loader } from '@mantine/core';
 import { IconCloudDownload } from '@tabler/icons-react';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { QueryClient, useQuery } from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
 
@@ -54,7 +54,7 @@ function ImportPanel({ context }: { context: any }) {
             await refetch();
         } catch (error: any) {
             if (error.name === 'AbortError') {
-                alert('The request timed out. Please try again. ' + pluginSettings);
+                alert('The request timed out. Please try again.');
             } else {
                 alert('An error has occurred while importing data.');
             }
