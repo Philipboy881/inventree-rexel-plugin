@@ -29,7 +29,7 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
         },
         'USER_GROUP': {
             'name': 'Allowed Group',
-            'description': 'The user group that is allowed to view order history',
+            'description': 'The user group that is allowed to view rexel import',
             'model': 'auth.group',
         }
     }
