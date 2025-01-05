@@ -1,4 +1,4 @@
-import { Code, Button, Group, Paper, TextInput, MantineProvider, Alert, Text, Loader } from '@mantine/core';
+import { Code, Button, Group, Paper, TextInput, MantineProvider, MantineTheme, Alert, Text, Loader } from '@mantine/core';
 import { IconCloudDownload } from '@tabler/icons-react';
 import { useState, useMemo } from 'react';
 import { QueryClient, useQuery } from '@tanstack/react-query';
@@ -128,7 +128,7 @@ export function renderPanel(target: HTMLElement, context: any) {
   const colorScheme = context?.colorScheme ?? 'light';  // Fallback naar 'light' als geen kleurmodus is doorgegeven
 
   createRoot(target).render(
-    <MantineProvider theme={{ colorScheme }}>
+    <MantineProvider theme={{ theme={{ colorScheme: colorScheme } as MantineTheme}> }}>
       <ImportPanel context={context} />
     </MantineProvider>
   );
