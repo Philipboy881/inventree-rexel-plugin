@@ -77,8 +77,6 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
         if not self.is_panel_visible(target, pk):
             return []
 
-        color_scheme = user.profile.color_scheme if hasattr(user, 'profile') else 'light'  # Aangepaste logica voor kleurmodus
-
         return [
             {
                 'key': 'rexel',
@@ -90,7 +88,6 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
                 ),
                 'context': {
                     'settings': self.plugin_settings,
-                    'colorScheme': color_scheme,  # Kleurmodus doorgeven aan de frontend
                 }
             }
         ]
