@@ -37,7 +37,6 @@ class RexelHelper:
             # Log de fout, zodat je kunt zien waarom dit misgaat
             print(f"Fout bij ophalen/creëren van model: {e}")
             raise e
-    
     def add_or_update_parameters(self, part, parameters):
         """
         Voeg parameters toe aan een Part of werk bestaande parameters bij.
@@ -166,12 +165,11 @@ class RexelHelper:
 
             if not product_number or not internal_part_number:
                 raise ValueError("Product number and part number are required")
-            
             manufacturer_name = rexel_data.get("brand", "Unknown")
             manufacturer_id = self.find_or_create_company(manufacturer_name)
 
             self.create_part(rexel_data, manufacturer_id, rexel_id, internal_part_number)
-
+            raise ValueError("part created and saved")
 
             print("Data verwerking voltooid.")
         except Exception as e:
@@ -181,7 +179,6 @@ class RexelHelper:
         """
         Verwerk Rexel-productgegevens en maak de benodigde database-objecten aan.
         """
- 
         product_number = data.get("product_number")
 
         datahandler = DataHandler()

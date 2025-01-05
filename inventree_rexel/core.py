@@ -29,7 +29,7 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
         },
         'USER_GROUP': {
             'name': 'Allowed Group',
-            'description': 'The user group that is allowed to view order history',
+            'description': 'The user group that is allowed to view rexel import',
             'model': 'auth.group',
         }
     }
@@ -76,7 +76,7 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
         # Panel should not be visible for this target!
         if not self.is_panel_visible(target, pk):
             return []
-        
+
         return [
             {
                 'key': 'rexel',
