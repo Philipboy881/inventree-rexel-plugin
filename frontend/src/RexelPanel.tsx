@@ -1,4 +1,4 @@
-import { Code, Button, Group, Paper, TextInput, MantineProvider, MantineTheme, Alert, Text, Loader } from '@mantine/core';
+import { Code, Button, Group, Paper, TextInput, MantineProvider, Alert, Text, Loader } from '@mantine/core';
 import { IconCloudDownload } from '@tabler/icons-react';
 import { useState, useMemo } from 'react';
 import { QueryClient, useQuery } from '@tanstack/react-query';
@@ -8,8 +8,7 @@ import { createRoot } from 'react-dom/client';
 const queryClient = new QueryClient();
 
 function ImportPanel({ context }: { context: any }) {
-    const pluginSettings = useMemo(() => context?.context?.settings ?? {}, [context]);
-
+    
     const [product_number, setproduct_number] = useState('');
     const [part_number, setpart_number] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -127,9 +126,8 @@ function ImportPanel({ context }: { context: any }) {
 
 // Render de ImportPanel component zonder QueryClientProvider
 export function renderPanel(target: HTMLElement, context: any) {
-    const colorScheme = context?.scheme ?? 'light';  // Fallback naar 'light' als geen kleurmodus is doorgegeven
     createRoot(target).render(
-      <MantineProvider theme={{ colorScheme } as Partial<MantineTheme>}>
+      <MantineProvider>
         <ImportPanel context={context} />
       </MantineProvider>
   );
