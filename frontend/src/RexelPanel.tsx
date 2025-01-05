@@ -1,6 +1,6 @@
-import { Code, Button, Group, Paper, TextInput, MantineProvider, MantineThemeOverride, Alert, Text, Loader } from '@mantine/core';
+import { Code, Button, Group, Paper, TextInput, MantineProvider, useMantineColorScheme, Alert, Text, Loader } from '@mantine/core';
 import { IconCloudDownload } from '@tabler/icons-react';
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { QueryClient, useQuery } from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
 
@@ -123,17 +123,31 @@ function ImportPanel({ context }: { context: any }) {
 }
 
 // Render de ImportPanel component zonder QueryClientProvider
-export function renderPanel(target: HTMLElement, context: any) {
-    const storedScheme = localStorage.getItem('scheme');
-    const colorScheme = storedScheme === 'dark' ? 'dark' : 'light'; // Standaard naar 'light'
+// Functie om de kleurmodus op te halen uit localStorage
+const getColorSchemeFromStorage = () => {
+  const storedScheme = localStorage.getItem('scheme');
+  return storedScheme === 'dark' ? 'dark' : 'light';
+};
 
-    const themeOverride: MantineThemeOverride = {
-        colorScheme, // Dynamisch de kleurmodus instellen
+export function renderPanel(target: HTMLElement, context: any) {
+  const [colorScheme, setColorScheme] = useState<'light' | 'dark'>(getColorSchemeFromStorage());
+
+  useEffect(() => {
+    // Update de kleurmodus indien de waarde in localStorage verandert
+    const handleStorageChange = () => {
+      setColorScheme(getColorSchemeFromStorage());
     };
 
-    createRoot(target).render(
-        <MantineProvider theme={themeOverride}>
-            <ImportPanel context={context} />
-        </MantineProvider>
-    );
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  createRoot(target).render(
+    <MantineProvider theme={{ colorScheme }}>
+      <ImportPanel context={context} />
+    </MantineProvider>
+  );
 }
