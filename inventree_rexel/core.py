@@ -3,6 +3,7 @@
 from plugin import InvenTreePlugin
 from plugin.mixins import SettingsMixin, UrlsMixin, UserInterfaceMixin
 from .version import REXEL_PLUGIN_VERSION
+from django.conf import settings
 
 
 class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin):
@@ -76,6 +77,9 @@ class RexelPlugin(SettingsMixin, UrlsMixin, UserInterfaceMixin, InvenTreePlugin)
         # Panel should not be visible for this target!
         if not self.is_panel_visible(target, pk):
             return []
+
+        color_scheme = user.profile.color_scheme if hasattr(user, 'profile') else 'light'  # Aangepaste logica voor kleurmodus
+
         
         return [
             {
