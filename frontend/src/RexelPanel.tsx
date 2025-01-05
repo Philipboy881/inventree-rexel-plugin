@@ -123,9 +123,7 @@ function ImportPanel({ context }: { context: any }) {
 }
 
 // Render de ImportPanel component zonder QueryClientProvider
-export function renderPanel(target: HTMLElement) {
-    const context = useInvenTreeContext(); // Gebruik de context-hook
-
+export function renderPanel(target: HTMLElement, context: any) {
     createRoot(target).render(
         <MantineProvider
             theme={{
