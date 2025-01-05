@@ -128,7 +128,7 @@ export function renderPanel(target: HTMLElement, context: any) {
   const colorScheme = context?.colorScheme ?? 'light';  // Fallback naar 'light' als geen kleurmodus is doorgegeven
 
   createRoot(target).render(
-    <MantineProvider theme={{ theme={{ colorScheme: colorScheme } as MantineTheme}> }}>
+    <MantineProvider theme={{ colorScheme: colorScheme } as MantineTheme}> }}>
       <ImportPanel context={context} />
     </MantineProvider>
   );
