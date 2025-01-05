@@ -133,6 +133,7 @@ export function renderPanel(target: HTMLElement, context: any) {
     createRoot(target).render(
         <MantineProvider
             theme={{
+                ...MantineProvider.defaultProps?.theme, // Zorg ervoor dat andere thema-instellingen behouden blijven
                 colorScheme: isDarkMode ? 'dark' : 'light', // Stel de juiste modus in
             }}
         >
