@@ -123,13 +123,13 @@ function ImportPanel({ context }: { context: any }) {
 }
 
 // Render de ImportPanel component zonder QueryClientProvider
-export function renderPanel(target: HTMLElement, context: any) {
-    const isDarkMode = context?.theme?.dark ?? false;
+export function renderPanel(target: HTMLElement) {
+    const context = useInvenTreeContext(); // Gebruik de context-hook
 
     createRoot(target).render(
         <MantineProvider
             theme={{
-                colorScheme: isDarkMode ? 'dark' : 'light', // Stel de kleurmodus in via het theme-object
+                colorScheme: context.colorScheme, // Gebruik de kleurmodus van de context
             }}
         >
             <ImportPanel context={context} />
