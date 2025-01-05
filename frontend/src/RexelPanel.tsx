@@ -13,7 +13,6 @@ function ImportPanel({ context }: { context: any }) {
     const [product_number, setproduct_number] = useState('');
     const [part_number, setpart_number] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    //const colorScheme = localStorage.getItem('scheme') || 'light'; // Default to 'light' if not set
 
     const IVENTREE_REXEL_URL = "plugin/inventree_rexel/rexel/";
 
@@ -66,30 +65,33 @@ function ImportPanel({ context }: { context: any }) {
     };
 
     return (
-        <Paper withBorder p="sm" m="sm" pos="relative">
+        <Paper withBorder p="sm" m="sm" pos="relative" style={{ width: '100%', boxSizing: 'border-box' }}>
             {isError && (
                 <Alert color="red" title="Error">
                     An error has occurred while getting your data.
                 </Alert>
             )}
 
-            <Group gap="xs" grow>
+            <Group gap="xs" grow style={{ width: '100%' }}>
                 <TextInput
                     label="Product EAN, SKU, Type of description"
                     placeholder="Enter product data"
                     value={product_number}
                     onChange={(event) => setproduct_number(event.currentTarget.value)}
+                    style={{ width: '100%' }} // Zorg ervoor dat het invoerveld altijd 100% breedte heeft
                 />
                 <TextInput
                     label="New internal part number"
                     placeholder="Enter new part number"
                     value={part_number}
                     onChange={(event) => setpart_number(event.currentTarget.value)}
+                    style={{ width: '100%' }} // Zorg ervoor dat het invoerveld altijd 100% breedte heeft
                 />
                 <Button
                     leftSection={<IconCloudDownload />}
                     onClick={handleImport}
                     disabled={isSubmitting || isLoading}
+                    style={{ width: '100%' }} // Zorg ervoor dat de knop altijd goed zichtbaar blijft
                 >
                     Import
                 </Button>
@@ -131,5 +133,4 @@ export function renderPanel(target: HTMLElement, context: any) {
         <ImportPanel context={context} />
       </MantineProvider>
   );
-
 }
