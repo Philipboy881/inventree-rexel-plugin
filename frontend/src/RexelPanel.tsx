@@ -22,25 +22,28 @@ function ImportPanel({ context }: { context: any }) {
         part_number: string;
         status: string;
         message: string;
-    }>({
-        queryKey: ['import-data', product_number, part_number],
-        queryFn: async () => {
-            const controller = new AbortController(); // Voor timeout
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // Timeout na 10 seconden
+    }>(
+        {
+            queryKey: ['import-data', product_number, part_number],
+            queryFn: async () => {
+                const controller = new AbortController(); // Voor timeout
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // Timeout na 10 seconden
 
-            try {
-                const response = await context.api?.post(IVENTREE_REXEL_URL, {
-                    product_number,
-                    part_number,
-                    signal: controller.signal, // AbortController signal
-                });
-                return response?.data;
-            } finally {
-                clearTimeout(timeoutId); // Zorg ervoor dat de timeout wordt opgeruimd
-            }
+                try {
+                    const response = await context.api?.post(IVENTREE_REXEL_URL, {
+                        product_number,
+                        part_number,
+                        signal: controller.signal, // AbortController signal
+                    });
+                    return response?.data;
+                } finally {
+                    clearTimeout(timeoutId); // Zorg ervoor dat de timeout wordt opgeruimd
+                }
+            },
+            enabled: false, // Alleen uitvoeren als refetch wordt aangeroepen
         },
-        enabled: false, // Alleen uitvoeren als refetch wordt aangeroepen
-    }, queryClient);
+        queryClient
+    );
 
     const handleImport = async () => {
         if (!product_number || !part_number) {
@@ -105,15 +108,17 @@ function ImportPanel({ context }: { context: any }) {
 
             {/* Spinner onderaan de pagina */}
             {(isSubmitting || isLoading) && (
-                <div style={{
-                    position: 'absolute', 
-                    bottom: '20px', 
-                    left: '50%', 
-                    transform: 'translateX(-50%)', 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    width: '100%',
-                }}>
+                <div
+                    style={{
+                        position: 'absolute',
+                        bottom: '20px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        width: '100%',
+                    }}
+                >
                     <Loader size="xl" />
                 </div>
             )}
@@ -123,8 +128,14 @@ function ImportPanel({ context }: { context: any }) {
 
 // Render de ImportPanel component zonder QueryClientProvider
 export function renderPanel(target: HTMLElement, context: any) {
+    const isDarkMode = context?.theme?.dark ?? false; // Controleer of Inventree in dark mode is
+
     createRoot(target).render(
-        <MantineProvider>
+        <MantineProvider
+            theme={{
+                colorScheme: isDarkMode ? 'dark' : 'light', // Stel de juiste modus in
+            }}
+        >
             <ImportPanel context={context} />
         </MantineProvider>
     );
