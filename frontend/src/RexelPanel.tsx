@@ -127,7 +127,11 @@ export function renderPanel(target: HTMLElement, context: any) {
     const isDarkMode = context?.theme?.dark ?? false;
 
     createRoot(target).render(
-        <MantineProvider colorScheme={isDarkMode ? 'dark' : 'light'}>
+        <MantineProvider
+            theme={{
+                colorScheme: isDarkMode ? 'dark' : 'light', // Stel de kleurmodus in via het theme-object
+            }}
+        >
             <ImportPanel context={context} />
         </MantineProvider>
     );
