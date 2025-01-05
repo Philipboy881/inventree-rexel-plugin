@@ -1,6 +1,6 @@
-import { Code, Button, Group, Paper, TextInput, MantineProvider, useMantineColorScheme, Alert, Text, Loader } from '@mantine/core';
+import { Code, Button, Group, Paper, TextInput, MantineProvider, Alert, Text, Loader } from '@mantine/core';
 import { IconCloudDownload } from '@tabler/icons-react';
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { QueryClient, useQuery } from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
 
@@ -123,27 +123,9 @@ function ImportPanel({ context }: { context: any }) {
 }
 
 // Render de ImportPanel component zonder QueryClientProvider
-// Functie om de kleurmodus op te halen uit localStorage
-const getColorSchemeFromStorage = () => {
-  const storedScheme = localStorage.getItem('scheme');
-  return storedScheme === 'dark' ? 'dark' : 'light';
-};
-
 export function renderPanel(target: HTMLElement, context: any) {
-  const [colorScheme, setColorScheme] = useState<'light' | 'dark'>(getColorSchemeFromStorage());
-
-  useEffect(() => {
-    // Update de kleurmodus indien de waarde in localStorage verandert
-    const handleStorageChange = () => {
-      setColorScheme(getColorSchemeFromStorage());
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
+  // Verkrijg kleurmodus uit context die door de backend is doorgegeven
+  const colorScheme = context?.colorScheme ?? 'light';  // Fallback naar 'light' als geen kleurmodus is doorgegeven
 
   createRoot(target).render(
     <MantineProvider theme={{ colorScheme }}>
