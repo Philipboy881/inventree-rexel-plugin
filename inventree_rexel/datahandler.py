@@ -41,7 +41,7 @@ class DataHandler:
                 images = product.get('images', [])
                 # Controleer of de [3] afbeelding bestaat, anders gebruik [0]
                 image_url = images[3].get('url') if len(images) > 3 and 'url' in images[3] else (
-                images[0].get('url') if len(images) > 0 and 'url' in images[0] else 'Image not available')
+                    images[0].get('url') if len(images) > 0 and 'url' in images[0] else 'Image not available')
 
                 return {
                     "code": product.get('code', 'Code not available'),
