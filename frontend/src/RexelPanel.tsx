@@ -1,134 +1,152 @@
-import { Code, Button, Group, Paper, TextInput, MantineProvider, Alert, Text, Loader } from '@mantine/core';
-import { IconCloudDownload } from '@tabler/icons-react';
-import { useState } from 'react';
-import { QueryClient, useQuery } from '@tanstack/react-query';
-import { createRoot } from 'react-dom/client';
-
-// Maak een nieuwe QueryClient aan
-const queryClient = new QueryClient();
-
-function ImportPanel({ context }: { context: any }) {
-    
-    const [product_number, setproduct_number] = useState('');
-    const [part_number, setpart_number] = useState('');
+import {
+    Accordion,
+    Button,
+    Paper,
+    TextInput,
+    MantineProvider,
+    Alert,
+    Text,
+    Loader,
+    Group,
+    Stack,
+    Code,
+    ColorSchemeProvider,
+    ColorScheme,
+  } from '@mantine/core';
+  import { useState } from 'react';
+  import { IconCloudDownload } from '@tabler/icons-react';
+  import { QueryClient, useQuery } from '@tanstack/react-query';
+  import { createRoot } from 'react-dom/client';
+  
+  // Maak een nieuwe QueryClient aan
+  const queryClient = new QueryClient();
+  
+  function ImportPanel({ context }: { context: any }) {
+    const [product_number, setProductNumber] = useState('');
+    const [part_number, setPartNumber] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const IVENTREE_REXEL_URL = "plugin/inventree_rexel/rexel/";
-
+  
+    const IVENTREE_REXEL_URL = 'plugin/inventree_rexel/rexel/';
+  
     const { data, isError, isLoading, refetch } = useQuery<{
-        product_number: string;
-        part_number: string;
-        status: string;
-        message: string;
+      product_number: string;
+      part_number: string;
+      status: string;
+      message: string;
     }>(
-        {
-            queryKey: ['import-data', product_number, part_number],
-            queryFn: async () => {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-                try {
-                    const response = await context.api?.post(IVENTREE_REXEL_URL, {
-                        product_number,
-                        part_number,
-                        signal: controller.signal,
-                    });
-                    return response?.data;
-                } finally {
-                    clearTimeout(timeoutId);
-                }
-            },
-            enabled: false,
+      {
+        queryKey: ['import-data', product_number, part_number],
+        queryFn: async () => {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000);
+  
+          try {
+            const response = await context.api?.post(IVENTREE_REXEL_URL, {
+              product_number,
+              part_number,
+              signal: controller.signal,
+            });
+            return response?.data;
+          } finally {
+            clearTimeout(timeoutId);
+          }
         },
-        queryClient
+        enabled: false,
+      },
+      queryClient
     );
-
+  
     const handleImport = async () => {
-        if (!product_number || !part_number) {
-            alert('Enter both fields before import.');
-            return;
+      if (!product_number || !part_number) {
+        alert('Enter both fields before import.');
+        return;
+      }
+  
+      try {
+        setIsSubmitting(true);
+        await refetch();
+      } catch (error: any) {
+        if (error.name === 'AbortError') {
+          alert('The request timed out. Please try again.');
+        } else {
+          alert('An error has occurred while importing data.');
         }
-
-        try {
-            setIsSubmitting(true);
-            await refetch();
-        } catch (error: any) {
-            if (error.name === 'AbortError') {
-                alert('The request timed out. Please try again.');
-            } else {
-                alert('An error has occurred while importing data.');
-            }
-        } finally {
-            setIsSubmitting(false);
-        }
+      } finally {
+        setIsSubmitting(false);
+      }
     };
-
+  
     return (
-        <Paper withBorder p="sm" m="sm" pos="relative" style={{ width: '100%', boxSizing: 'border-box' }}>
-            {isError && (
+      <Accordion defaultValue="import-panel">
+        <Accordion.Item value="import-panel">
+          <Accordion.Control>Import Data</Accordion.Control>
+          <Accordion.Panel>
+            <Paper withBorder p="sm">
+              {isError && (
                 <Alert color="red" title="Error">
-                    An error has occurred while getting your data.
+                  An error has occurred while getting your data.
                 </Alert>
-            )}
-
-            <Group gap="xs" grow style={{ width: '100%' }}>
+              )}
+  
+              <Stack spacing="xs">
                 <TextInput
-                    label="Product EAN, SKU, Type of description"
-                    placeholder="Enter product data"
-                    value={product_number}
-                    onChange={(event) => setproduct_number(event.currentTarget.value)}
-                    style={{ width: '100%' }} // Zorg ervoor dat het invoerveld altijd 100% breedte heeft
+                  label="Product EAN, SKU, Type of description"
+                  placeholder="Enter product data"
+                  value={product_number}
+                  onChange={(event) => setProductNumber(event.currentTarget.value)}
                 />
                 <TextInput
-                    label="New internal part number"
-                    placeholder="Enter new part number"
-                    value={part_number}
-                    onChange={(event) => setpart_number(event.currentTarget.value)}
-                    style={{ width: '100%' }} // Zorg ervoor dat het invoerveld altijd 100% breedte heeft
+                  label="New internal part number"
+                  placeholder="Enter new part number"
+                  value={part_number}
+                  onChange={(event) => setPartNumber(event.currentTarget.value)}
                 />
                 <Button
-                    leftSection={<IconCloudDownload />}
-                    onClick={handleImport}
-                    disabled={isSubmitting || isLoading}
-                    style={{ width: '100%' }} // Zorg ervoor dat de knop altijd goed zichtbaar blijft
+                  leftSection={<IconCloudDownload />}
+                  onClick={handleImport}
+                  disabled={isSubmitting || isLoading}
                 >
-                    Import
+                  Import
                 </Button>
-            </Group>
-
-            {data && (
+              </Stack>
+  
+              {data && (
                 <Paper mt="md" withBorder p="sm">
-                    <Text>Import Results:</Text>
-                    <Code block>
-                        {JSON.stringify(data ?? {}, null, 2)}
-                    </Code>
+                  <Text>Import Results:</Text>
+                  <Code block>{JSON.stringify(data ?? {}, null, 2)}</Code>
                 </Paper>
-            )}
-
-            {(isSubmitting || isLoading) && (
-                <div
-                    style={{
-                        position: 'absolute',
-                        bottom: '20px',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        width: '100%',
-                    }}
-                >
-                    <Loader size="xl" />
+              )}
+  
+              {(isSubmitting || isLoading) && (
+                <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                  <Loader size="xl" />
                 </div>
-            )}
-        </Paper>
+              )}
+            </Paper>
+          </Accordion.Panel>
+        </Accordion.Item>
+      </Accordion>
     );
-}
-
-// Render de ImportPanel component zonder QueryClientProvider
-export function renderPanel(target: HTMLElement, context: any) {
-    createRoot(target).render(
-      <MantineProvider>
-        <ImportPanel context={context} />
-      </MantineProvider>
-  );
-}
+  }
+  
+  // MantineProvider met Dark Modus Configuratie
+  function App({ context }: { context: any }) {
+    const [colorScheme, setColorScheme] = useState<ColorScheme>('light');
+  
+    const toggleColorScheme = (value?: ColorScheme) =>
+      setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
+  
+    return (
+      <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
+        <MantineProvider theme={{ colorScheme }} withGlobalStyles withNormalizeCSS>
+          <ImportPanel context={context} />
+        </MantineProvider>
+      </ColorSchemeProvider>
+    );
+  }
+  
+  // Render de App-component
+  export function renderPanel(target: HTMLElement, context: any) {
+    createRoot(target).render(<App context={context} />);
+  }
+  
