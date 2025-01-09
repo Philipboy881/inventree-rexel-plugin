@@ -38,11 +38,16 @@ class DataHandler:
 
             if 'products' in data and len(data['products']) > 0:
                 product = data['products'][0]
+                images = product.get('images', [])
+                # Controleer of de [3] afbeelding bestaat, anders gebruik [0]
+                image_url = images[3].get('url') if len(images) > 3 and 'url' in images[3] else (
+                images[0].get('url') if len(images) > 0 and 'url' in images[0] else 'Image not available')
+
                 return {
                     "code": product.get('code', 'Code not available'),
                     "name": product.get('name', 'Name not available'),
                     "url": product.get('url', 'URL not available'),
-                    "image url": product["images"][3].get('url', 'Image not available'),
+                    "image url": image_url,
                     "brand": product.get('brandName', 'Brand not available'),
                     "ean": product.get('ean', 'EAN not available'),
                     "unit": product.get('numberContentUnits', 'Unit not available'),
