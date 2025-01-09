@@ -1,7 +1,6 @@
 import {
     Accordion,
     Button,
-    Paper,
     TextInput,
     MantineProvider,
     Alert,
@@ -10,8 +9,6 @@ import {
     Group,
     Stack,
     Code,
-    ColorSchemeProvider,
-    ColorScheme,
   } from '@mantine/core';
   import { useState } from 'react';
   import { IconCloudDownload } from '@tabler/icons-react';
@@ -81,72 +78,58 @@ import {
         <Accordion.Item value="import-panel">
           <Accordion.Control>Import Data</Accordion.Control>
           <Accordion.Panel>
-            <Paper withBorder p="sm">
-              {isError && (
-                <Alert color="red" title="Error">
-                  An error has occurred while getting your data.
-                </Alert>
-              )}
+            {isError && (
+              <Alert color="red" title="Error">
+                An error has occurred while getting your data.
+              </Alert>
+            )}
   
-              <Stack spacing="xs">
-                <TextInput
-                  label="Product EAN, SKU, Type of description"
-                  placeholder="Enter product data"
-                  value={product_number}
-                  onChange={(event) => setProductNumber(event.currentTarget.value)}
-                />
-                <TextInput
-                  label="New internal part number"
-                  placeholder="Enter new part number"
-                  value={part_number}
-                  onChange={(event) => setPartNumber(event.currentTarget.value)}
-                />
-                <Button
-                  leftSection={<IconCloudDownload />}
-                  onClick={handleImport}
-                  disabled={isSubmitting || isLoading}
-                >
-                  Import
-                </Button>
-              </Stack>
+            <Stack spacing="xs">
+              <TextInput
+                label="Product EAN, SKU, Type of description"
+                placeholder="Enter product data"
+                value={product_number}
+                onChange={(event) => setProductNumber(event.currentTarget.value)}
+              />
+              <TextInput
+                label="New internal part number"
+                placeholder="Enter new part number"
+                value={part_number}
+                onChange={(event) => setPartNumber(event.currentTarget.value)}
+              />
+              <Button
+                leftSection={<IconCloudDownload />}
+                onClick={handleImport}
+                disabled={isSubmitting || isLoading}
+              >
+                Import
+              </Button>
+            </Stack>
   
-              {data && (
-                <Paper mt="md" withBorder p="sm">
-                  <Text>Import Results:</Text>
-                  <Code block>{JSON.stringify(data ?? {}, null, 2)}</Code>
-                </Paper>
-              )}
+            {data && (
+              <div style={{ marginTop: '16px' }}>
+                <Text>Import Results:</Text>
+                <Code block>{JSON.stringify(data ?? {}, null, 2)}</Code>
+              </div>
+            )}
   
-              {(isSubmitting || isLoading) && (
-                <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                  <Loader size="xl" />
-                </div>
-              )}
-            </Paper>
+            {(isSubmitting || isLoading) && (
+              <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                <Loader size="xl" />
+              </div>
+            )}
           </Accordion.Panel>
         </Accordion.Item>
       </Accordion>
     );
   }
   
-  // MantineProvider met Dark Modus Configuratie
-  function App({ context }: { context: any }) {
-    const [colorScheme, setColorScheme] = useState<ColorScheme>('light');
-  
-    const toggleColorScheme = (value?: ColorScheme) =>
-      setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
-  
-    return (
-      <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
-        <MantineProvider theme={{ colorScheme }} withGlobalStyles withNormalizeCSS>
-          <ImportPanel context={context} />
-        </MantineProvider>
-      </ColorSchemeProvider>
-    );
-  }
-  
-  // Render de App-component
+  // Render de ImportPanel component
   export function renderPanel(target: HTMLElement, context: any) {
-    createRoot(target).render(<App context={context} />);
+    createRoot(target).render(
+      <MantineProvider withGlobalStyles withNormalizeCSS>
+        <ImportPanel context={context} />
+      </MantineProvider>
+    );
   }
   
