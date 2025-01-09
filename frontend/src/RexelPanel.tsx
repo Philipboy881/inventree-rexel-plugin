@@ -6,7 +6,6 @@ import {
     Alert,
     Text,
     Loader,
-    Group,
     Stack,
     Code,
   } from '@mantine/core';
@@ -14,7 +13,9 @@ import {
   import { IconCloudDownload } from '@tabler/icons-react';
   import { QueryClient, useQuery } from '@tanstack/react-query';
   import { createRoot } from 'react-dom/client';
-  
+  import React from 'react';
+
+
   // Maak een nieuwe QueryClient aan
   const queryClient = new QueryClient();
   
@@ -84,7 +85,7 @@ import {
               </Alert>
             )}
   
-            <Stack spacing="xs">
+            <Stack gap="xs">
               <TextInput
                 label="Product EAN, SKU, Type of description"
                 placeholder="Enter product data"
@@ -127,7 +128,7 @@ import {
   // Render de ImportPanel component
   export function renderPanel(target: HTMLElement, context: any) {
     createRoot(target).render(
-      <MantineProvider withGlobalStyles withNormalizeCSS>
+      <MantineProvider>
         <ImportPanel context={context} />
       </MantineProvider>
     );
