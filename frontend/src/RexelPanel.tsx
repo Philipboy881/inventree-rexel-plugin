@@ -9,11 +9,11 @@ import {
     Stack,
     Code,
   } from '@mantine/core';
-  import { useState } from 'react';
-  import { IconCloudDownload } from '@tabler/icons-react';
-  import { QueryClient, useQuery } from '@tanstack/react-query';
-  import { createRoot } from 'react-dom/client';
-  import React from 'react';
+import { useState } from 'react';
+import { IconCloudDownload } from '@tabler/icons-react';
+import { QueryClient, useQuery } from '@tanstack/react-query';
+import { createRoot } from 'react-dom/client';
+
 
 
   // Maak een nieuwe QueryClient aan
