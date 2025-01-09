@@ -37,6 +37,7 @@ class RexelHelper:
             # Log de fout, zodat je kunt zien waarom dit misgaat
             print(f"Fout bij ophalen/creëren van model: {e}")
             raise e
+
     def add_or_update_parameters(self, part, parameters):
         """
         Voeg parameters toe aan een Part of werk bestaande parameters bij.
