@@ -11,7 +11,7 @@ from .datahandler import DataHandler
 import threading
 
 
-class RexelHelper:
+class RexelHelper():
     @staticmethod
     def retry_database_operation(func, retries=5, delay=0.5):
         """
@@ -144,35 +144,26 @@ class RexelHelper:
         manufacturer_part = self.get_or_create_manufacturer_part(internal_part_number, manufacturer_part_number, manufacturer_id)
         supplier_part = self.create_supplier_part(internal_part_number, supplier_id, manufacturer_part, supplier_part_number)
 
-        part.default_supplier = supplier_part
-        part.save()
+        try:
+            part.default_supplier = supplier_part
+            part.save()
+        except Exception as e:
+            print(f"Error asving data: {e}")
 
         general_info = data.get("general_information", {})
-        self.add_or_update_parameters(part, general_info)
-
+        threading.Thread(target=self._process_data_in_background, args=(part, general_info,)).start()
         return part.id
 
-    def _process_data_in_background(self, data, rexel_data):
+    def _process_data_in_background(self, part, general_info):
         """
         Verwerk de Rexel data in de achtergrond (achtergrond thread).
         Dit is de werkelijke verwerking die in een aparte thread draait.
         """
         try:
             # Je verwerking van de Rexel data hier
-            print("Processing Rexel data in the background...")
-            rexel_id = self.find_or_create_company("rexel")
-            product_number = data.get("product_number")
-            internal_part_number = data.get("part_number")
+            self.add_or_update_parameters(part, general_info)
 
-            if not product_number or not internal_part_number:
-                raise ValueError("Product number and part number are required")
-            manufacturer_name = rexel_data.get("brand", "Unknown")
-            manufacturer_id = self.find_or_create_company(manufacturer_name)
-
-            self.create_part(rexel_data, manufacturer_id, rexel_id, internal_part_number)
             raise ValueError("part created and saved")
-
-            print("Data verwerking voltooid.")
         except Exception as e:
             print(f"Fout bij het verwerken van de Rexel data: {e}")
 
@@ -181,9 +172,15 @@ class RexelHelper:
         Verwerk Rexel-productgegevens en maak de benodigde database-objecten aan.
         """
         product_number = data.get("product_number")
-
         datahandler = DataHandler()
         rexel_data = datahandler.requestdata(product_number, "", "")
 
-        threading.Thread(target=self._process_data_in_background, args=(data, rexel_data,)).start()
+        rexel_id = self.find_or_create_company("rexel")
+        internal_part_number = data.get("part_number")
+
+        manufacturer_name = rexel_data.get("brand", "Unknown")
+        manufacturer_id = self.find_or_create_company(manufacturer_name)
+
+        self.create_part(rexel_data, manufacturer_id, rexel_id, internal_part_number)
+
         return rexel_data.get("name") + " word toegevoegd"
