@@ -21,7 +21,6 @@ import { createRoot } from 'react-dom/client';
   
   function ImportPanel({ context }: { context: any }) {
     const [product_number, setProductNumber] = useState('');
-    const [part_number, setPartNumber] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
   
     const IVENTREE_REXEL_URL = 'plugin/inventree_rexel/rexel/';
