@@ -92,12 +92,6 @@ import { createRoot } from 'react-dom/client';
                 value={product_number}
                 onChange={(event) => setProductNumber(event.currentTarget.value)}
               />
-              <TextInput
-                label="New internal part number"
-                placeholder="Enter new part number"
-                value={part_number}
-                onChange={(event) => setPartNumber(event.currentTarget.value)}
-              />
               <Button
                 leftSection={<IconCloudDownload />}
                 onClick={handleImport}

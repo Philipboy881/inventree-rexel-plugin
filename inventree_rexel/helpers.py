@@ -125,7 +125,6 @@ class RexelHelper():
                 remote_img = download_image_from_url(image_url)
             except Exception as e:
                 print(f"Error downloading image: {e}")
-
         part = Part.objects.create(
             IPN=internal_part_number,
             name=name,
@@ -176,11 +175,11 @@ class RexelHelper():
         rexel_data = datahandler.requestdata(product_number, "", "")
 
         rexel_id = self.find_or_create_company("rexel")
-        internal_part_number = data.get("part_number")
+        internal_part_number = Part.objects.count() + 2400001
 
         manufacturer_name = rexel_data.get("brand", "Unknown")
         manufacturer_id = self.find_or_create_company(manufacturer_name)
 
-        self.create_part(rexel_data, manufacturer_id, rexel_id, internal_part_number)
+        self.create_part(rexel_data, manufacturer_id, rexel_id, str(internal_part_number))
 
         return rexel_data.get("name") + " word toegevoegd"
