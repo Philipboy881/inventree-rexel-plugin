@@ -32,7 +32,7 @@ import { createRoot } from 'react-dom/client';
       message: string;
     }>(
       {
-        queryKey: ['import-data', product_number, part_number],
+        queryKey: ['import-data', product_number],
         queryFn: async () => {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 10000);
@@ -40,7 +40,6 @@ import { createRoot } from 'react-dom/client';
           try {
             const response = await context.api?.post(IVENTREE_REXEL_URL, {
               product_number,
-              part_number,
               signal: controller.signal,
             });
             return response?.data;
@@ -54,8 +53,8 @@ import { createRoot } from 'react-dom/client';
     );
   
     const handleImport = async () => {
-      if (!product_number || !part_number) {
-        alert('Enter both fields before import.');
+      if (!product_number) {
+        alert('Enter required field before import.');
         return;
       }
   
